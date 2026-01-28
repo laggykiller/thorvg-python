@@ -105,7 +105,7 @@ jobs:
           CIBW_ARCHS_LINUX: ${{ matrix.cibw_archs_linux }}
           # Required for building with python 3.7-3.10
           # https://github.com/urllib3/urllib3/issues/2168
-          CIBW_BEFORE_BUILD_LINUX: pip install urllib~=1.26.20
+          CIBW_BEFORE_BUILD_LINUX: pip install urllib3~=1.26.20
           CIBW_BUILD: ${{ matrix.cibw_build }}
           CIBW_TEST_REQUIRES: pytest
           CIBW_BEFORE_TEST: pip install --only-binary ":all:" Pillow; true
