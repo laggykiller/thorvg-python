@@ -2,8 +2,15 @@
 import ctypes
 from typing import Optional, Sequence, Tuple, cast
 
-from ..base import (ColorStop, GradientStruct, Identifier, Matrix, Result,
-                    StrokeFill, TvgType)
+from ..base import (
+    ColorStop,
+    GradientStruct,
+    Identifier,
+    Matrix,
+    Result,
+    StrokeFill,
+    TvgType,
+)
 from ..engine import Engine
 
 

@@ -358,8 +358,7 @@ class FillRule(IntEnum):
 
 
 class ColorStop(ctypes.Structure):
-    """A data structure storing the information about the color and its relative position inside the gradient bounds.
-    """
+    """A data structure storing the information about the color and its relative position inside the gradient bounds."""
 
     _fields_ = [
         ("offset", ctypes.c_float),
@@ -389,9 +388,9 @@ class Matrix(ctypes.Structure):
     """A data structure representing a three-dimensional matrix.
 
     The elements e11, e12, e21 and e22 represent the rotation matrix, including the scaling factor.
-    
+
     The elements e13 and e23 determine the translation of the object along the x and y-axis, respectively.
-    
+
     The elements e31 and e32 are set to 0, e33 is set to 1.
     """
 

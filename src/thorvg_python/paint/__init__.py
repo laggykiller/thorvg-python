@@ -2,8 +2,15 @@
 import ctypes
 from typing import Optional, Tuple
 
-from ..base import (BlendMethod, CompositeMethod, Identifier, Matrix,
-                    PaintStruct, Result, TvgType)
+from ..base import (
+    BlendMethod,
+    CompositeMethod,
+    Identifier,
+    Matrix,
+    PaintStruct,
+    Result,
+    TvgType,
+)
 from ..engine import Engine
 
 
