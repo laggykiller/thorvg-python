@@ -2,8 +2,7 @@
 name = "thorvg-python"
 description = "A ctypes API for thorvg, a vector graphics engine supporting SVG and Lottie formats."
 requires-python = ">=3.8"
-readme = "README.md"
-license = "LGPL-2.1-only"
+license = { file = "LICENSE" }
 authors = [{ "name" = "chaudominic", "email" = "chaudominic2@gmail.com" }]
 keywords = ["thorvg", "lottie", "svg", "ctypes", "python"]
 classifiers = ["Topic :: Multimedia :: Graphics"]
