@@ -39,11 +39,11 @@ jobs:
           - os: windows-latest
             arch: x64
             cibw_archs_windows: AMD64
-            cibw_build: "cp37* pp*"
+            cibw_build: "cp36* pp*"
           - os: windows-latest
             arch: x86
             cibw_archs_windows: x86
-            cibw_build: "cp37*"
+            cibw_build: "cp36*"
           - os: windows-latest
             arch: arm64
             cibw_archs_windows: ARM64
@@ -51,7 +51,7 @@ jobs:
           - os: macos-13
             arch: x64
             cibw_archs_macos: x86_64
-            cibw_build: "cp37* pp*"
+            cibw_build: "cp36* pp*"
           - os: macos-14
             arch: universal2
             cibw_archs_macos: universal2
@@ -63,23 +63,23 @@ jobs:
           - os: ubuntu-latest
             arch: x64
             cibw_archs_linux: x86_64
-            cibw_build: "cp37* pp*"
+            cibw_build: "cp36* pp*"
           - os: ubuntu-latest
             arch: x86
             cibw_archs_linux: i686
-            cibw_build: "cp37* pp*"
+            cibw_build: "cp36* pp*"
           - os: ubuntu-24.04-arm
             arch: arm64
             cibw_archs_linux: aarch64
-            cibw_build: "cp37* pp*"
+            cibw_build: "cp36* pp*"
           - os: ubuntu-latest
             arch: ppc64le
             cibw_archs_linux: ppc64le
-            cibw_build: "cp37*"
+            cibw_build: "cp36*"
           - os: ubuntu-latest
             arch: s390x
             cibw_archs_linux: s390x
-            cibw_build: "cp37*"
+            cibw_build: "cp36*"
 
     steps:
       - uses: actions/setup-python@v5
