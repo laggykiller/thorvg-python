@@ -106,7 +106,10 @@ def fetch_thorvg(conan_info: Dict[Any, Any]) -> List[str]:
                 continue
             for lib_name in libs:
                 if platform.system() == "Windows":
-                    lib_filename = "{}.dll".format(lib_name)
+                    # https://github.com/conan-io/conan-center-index/blob/a83f000910e17ec8612c59fb881930a603d49ff2/recipes/thorvg/all/conanfile.py#L164-L166
+                    lib_filename = "{}-0.dll".format(lib_name)
+                elif platform.system() == "Darwin":
+                    lib_filename = "lib{}.dylib".format(lib_name)
                 else:
                     lib_filename = "lib{}.so".format(lib_name)
 

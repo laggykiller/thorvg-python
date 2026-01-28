@@ -37,7 +37,7 @@ def _load_lib(thorvg_lib_path: Optional[str] = None) -> Optional[ctypes.CDLL]:
             return None
 
     if sys.platform.startswith(("win32", "cygwin", "msys", "os2")):
-        lib = _load_lib_with_prefix_suffix("", ".dll")
+        lib = _load_lib_with_prefix_suffix("", "-0.dll")
     elif sys.platform.startswith("darwin"):
         lib = _load_lib_with_prefix_suffix("lib", ".dylib")
     else:
@@ -56,7 +56,7 @@ def _load_lib(thorvg_lib_path: Optional[str] = None) -> Optional[ctypes.CDLL]:
         lib_prefixes = ("lib", "")
     else:
         lib_prefixes = ("lib", "")
-    lib_suffixes.extend([".so", ".dll", ".dylib"])
+    lib_suffixes.extend([".so", "-0.dll", ".dll", ".dylib"])
 
     for lib_prefix in lib_prefixes:
         for lib_suffix in set(lib_suffixes):
