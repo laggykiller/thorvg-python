@@ -1,0 +1,70 @@
+# Byte-compiled / optimized / DLL files
+**/__pycache__
+*.py[cod]
+
+# C extensions
+*.so
+*.dylib
+
+# Distribution / packaging
+bin/
+build/
+develop-eggs/
+dist/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+*.exe
+**/*.app
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+# Rope
+.ropeproject
+
+# Django stuff:
+*.log
+*.pot
+
+# Sphinx documentation
+docs/_build/
+
+# venv
+**/venv
+pyvenv.cfg
+**/lib64
+.version_full
+
+# wix
+*.wxs
+*.msi
+*.wixpdb
+**/.wix
+
+conan_output/**
+CMakeFiles/**
+CMakeCache.txt
+CMakeUserPresets.json

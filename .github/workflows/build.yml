@@ -1,0 +1,164 @@
+name: Build and upload to PyPI
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  build_sdist:
+    name: Build source distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Build sdist
+        run: pipx run build --sdist
+
+      - name: Test sdist
+        run: |
+          python -m pip install dist/thorvg_python-*.tar.gz
+          pip install Pillow pytest
+          pytest
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+          retention-days: 7
+
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }} ${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            arch: x64
+            cibw_archs_windows: AMD64
+            cibw_build: "cp37* pp*"
+          - os: windows-latest
+            arch: x86
+            cibw_archs_windows: x86
+            cibw_build: "cp37*"
+          - os: windows-latest
+            arch: arm64
+            cibw_archs_windows: ARM64
+            cibw_build: "cp39*"
+          - os: macos-13
+            arch: x64
+            cibw_archs_macos: x86_64
+            cibw_build: "cp37* pp*"
+          - os: macos-14
+            arch: universal2
+            cibw_archs_macos: universal2
+            cibw_build: "cp38* pp*"
+          - os: macos-14
+            arch: arm64
+            cibw_archs_macos: arm64
+            cibw_build: "cp38* pp*"
+          - os: ubuntu-latest
+            arch: x64
+            cibw_archs_linux: x86_64
+            cibw_build: "cp37* pp*"
+          - os: ubuntu-latest
+            arch: x86
+            cibw_archs_linux: i686
+            cibw_build: "cp37* pp*"
+          - os: ubuntu-24.04-arm
+            arch: arm64
+            cibw_archs_linux: aarch64
+            cibw_build: "cp37* pp*"
+          - os: ubuntu-latest
+            arch: ppc64le
+            cibw_archs_linux: ppc64le
+            cibw_build: "cp37*"
+          - os: ubuntu-latest
+            arch: s390x
+            cibw_archs_linux: s390x
+            cibw_build: "cp37*"
+
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+          
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Set up QEMU
+        if: runner.os == 'Linux'
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: all
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.17.0
+        env:
+          CIBW_BUILD_FRONTEND: build
+          CIBW_ARCHS_WINDOWS: ${{ matrix.cibw_archs_windows }}
+          CIBW_ARCHS_MACOS: ${{ matrix.cibw_archs_macos }}
+          CIBW_ARCHS_LINUX: ${{ matrix.cibw_archs_linux }}
+          CIBW_BUILD: ${{ matrix.cibw_build }}
+          CIBW_TEST_REQUIRES: pytest
+          CIBW_BEFORE_TEST: pip install --only-binary ":all:" Pillow; true
+          CIBW_BEFORE_TEST_WINDOWS: pip install --only-binary ":all:" Pillow || VER>NUL
+          CIBW_TEST_COMMAND: pytest {package}/tests
+          # Weird bug in pp38-win_amd64 causing test to fail
+          # OSError: [WinError 6] The handle is invalid: 'D:\\System Volume Information'
+          CIBW_TEST_SKIP: "pp*-win_amd64"
+      
+      - name: abi3audit
+        run: |
+          pip install abi3audit
+          abi3audit $(ls ./wheelhouse/*.whl) --debug --verbose
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}-${{ matrix.arch }}
+          path: ./wheelhouse/*.whl
+          retention-days: 7
+
+  upload_pypi_test:
+    needs: [build_wheels, build_sdist]
+    runs-on: ubuntu-latest
+    # upload to PyPI on every tag starting with 'v'
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: "Download artifacts"
+        uses: actions/download-artifact@v4
+      
+      - name: "Move packages to the dist/ folder"
+        run: |
+          mkdir dist/
+          mv sdist/* dist/
+          mv wheels-*/*.whl dist/
+
+      - name: "Publish packages on PyPI"
+        uses: pypa/gh-action-pypi-publish@v1.5.0
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
+
+  upload_pypi:
+    needs: [build_wheels, build_sdist]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+    steps:
+      - name: "Download artifacts"
+        uses: actions/download-artifact@v4
+      
+      - name: "Move packages to the dist/ folder"
+        run: |
+          mkdir dist/
+          mv sdist/* dist/
+          mv wheels-*/*.whl dist/
+
+      - name: "Publish packages on PyPI"
+        uses: pypa/gh-action-pypi-publish@v1.5.0
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
