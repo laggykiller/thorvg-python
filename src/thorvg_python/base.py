@@ -369,11 +369,11 @@ class ColorStop(ctypes.Structure):
         ("a", ctypes.c_uint8),
     ]
 
-    offset: ctypes.c_float  #: The relative position of the color.
-    r: ctypes.c_uint8  #: The red color channel value in the range [0 ~ 255].
-    g: ctypes.c_uint8  #: The green color channel value in the range [0 ~ 255].
-    b: ctypes.c_uint8  #: The blue color channel value in the range [0 ~ 255].
-    a: ctypes.c_uint8  #: The alpha channel value in the range [0 ~ 255], where 0 is completely transparent and 255 is opaque.
+    offset: float  #: The relative position of the color.
+    r: int  #: The red color channel value in the range [0 ~ 255].
+    g: int  #: The green color channel value in the range [0 ~ 255].
+    b: int  #: The blue color channel value in the range [0 ~ 255].
+    a: int  #: The alpha channel value in the range [0 ~ 255], where 0 is completely transparent and 255 is opaque.
 
 
 class PointStruct(ctypes.Structure):
