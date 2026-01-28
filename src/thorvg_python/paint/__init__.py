@@ -267,10 +267,10 @@ class Paint:
             If ``transformed`` is ``true``, the paint needs to be pushed into a canvas and updated before this api is called.
         .. seealso:: Canvas.update_paint()
         """
-        x = ctypes.c_float()
-        y = ctypes.c_float()
-        w = ctypes.c_float()
-        h = ctypes.c_float()
+        x = ctypes.c_float(0.0)
+        y = ctypes.c_float(0.0)
+        w = ctypes.c_float(0.0)
+        h = ctypes.c_float(0.0)
         self.thorvg_lib.tvg_paint_get_bounds.argtypes = [
             ctypes.POINTER(PaintStruct),
             ctypes.POINTER(ctypes.c_float),

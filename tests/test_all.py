@@ -358,6 +358,7 @@ def test_paint():
     scene = tvg.Scene(engine)
 
     shape = tvg.Shape(engine)
+    assert scene.push(shape) == tvg.Result.SUCCESS
     assert shape.append_rect(16, 32, 64, 128, 0, 0) == tvg.Result.SUCCESS
     assert shape.scale(2.0) == tvg.Result.SUCCESS
     assert shape.rotate(45) == tvg.Result.SUCCESS
@@ -365,8 +366,6 @@ def test_paint():
 
     assert shape.set_opacity(60) == tvg.Result.SUCCESS
     assert shape.get_opacity() == (tvg.Result.SUCCESS, 60)
-
-    assert scene.push(shape) == tvg.Result.SUCCESS
 
     assert shape.get_bounds(False) == (tvg.Result.SUCCESS, 16, 32, 64, 128)
     assert shape.get_bounds(True) == (tvg.Result.SUCCESS, 16, 32, 64, 128)
