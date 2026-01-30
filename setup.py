@@ -59,7 +59,7 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
 
     settings.append(f"arch={arch}")
 
-    if not shutil.which("cmake") and (
+    if (
         platform.architecture()[0] == "32bit"
         or platform.machine().lower()
         not in (CONAN_ARCHS["armv8"] + CONAN_ARCHS["x86_64"])
@@ -69,7 +69,8 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
     if build == []:
         build.append("missing")
 
-    options.append("libwebp/*:with_simd=False")
+    if platform.system() != "Darwin":
+        options.append("libwebp/*:with_simd=False")
     options.append("thorvg/*:shared=True")
     options.append("thorvg/*:with_savers=all")
     options.append("thorvg/*:with_loaders=all")
