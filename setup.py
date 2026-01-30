@@ -3,6 +3,7 @@ import os
 import platform
 import shutil
 import subprocess
+import sys
 from typing import Any, Dict, List
 
 from setuptools import find_packages, setup  # type: ignore
@@ -46,6 +47,14 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
 
     if platform.system() == "Windows":
         settings.append("os=Windows")
+        if sys.platform.startswith(("cygwin", "msys")):
+            # Need python headers and libraries, but msvc not able to find them
+            # If inside cygwin or msys.
+            settings.append("compiler=gcc")
+            settings.append("compiler.version=10")
+            settings.append("compiler.libcxx=libstdc++")
+        else:
+            settings.append("compiler.runtime=static")
     elif platform.system() == "Darwin":
         settings.append("os=Macos")
         if arch == "x86_64":
@@ -73,32 +82,35 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
     print("build: " + str(build))
     print("options: " + str(options))
 
-    subprocess.run([
-        "conan",
-        "profile",
-        "detect",
-        "-f",
-        "--name",
-        "thorvg_python"
-    ])
+    profiles = subprocess.run(
+        ["conan", "profile", "list"],
+        stdout=subprocess.PIPE,
+    ).stdout.decode()
+    if "thorvg_python" not in profiles:
+        subprocess.run([
+            "conan",
+            "profile",
+            "detect",
+            "-f",
+            "--name",
+            "thorvg_python"
+        ])
 
     if platform.architecture()[0] == "32bit" or platform.machine().lower() not in (
         CONAN_ARCHS["armv8"] + CONAN_ARCHS["x86_64"]
     ):
-        cmake_version_long = subprocess.run(
-            ["cmake", "--version"],
-            stdout=subprocess.PIPE,
-        ).stdout.decode()
-        cmake_version = cmake_version_long.split("\n")[0].split(" ")[2]
         profile_path = subprocess.run(
             ["conan", "profile", "path", "thorvg_python"],
             stdout=subprocess.PIPE,
-        ).stdout.decode()
+        ).stdout.decode().strip()
 
         with open(profile_path, "a+") as f:
+            # https://github.com/conan-io/conan/issues/19179#issuecomment-3472691734
             f.write("\n")
             f.write("[platform_tool_requires]\n")
-            f.write(f"cmake/{cmake_version}")
+            f.write("cmake/*\n")
+            f.write("[replace_tool_requires]\n")
+            f.write("cmake/*: cmake/[*]")
 
     conan_output = os.path.join("conan_output", arch)
 
@@ -113,9 +125,8 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
             conan_output,
             "--deployer=direct_deploy",
             "--format=json",
-            "--profile:host=thorvg_python",
-            "--profile:build=thorvg_python",
             ".",
+            "--profile:all=thorvg_python",
         ],
         stdout=subprocess.PIPE,
     ).stdout.decode()

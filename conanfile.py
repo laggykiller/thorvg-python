@@ -9,6 +9,3 @@ class ThorvgRecipe(ConanFile):
 
     def build(self):
         build_type = "Release"  # noqa: F841
-
-    def build_requirements(self):
-        self.tool_requires("cmake/[>=3.17]")
