@@ -37,23 +37,23 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            arch: x64
+            arch: x86_64
           - os: windows-latest
             arch: x86
           - os: windows-latest
-            arch: arm64
+            arch: armv8
           - os: macos-15-intel
-            arch: x64
+            arch: x86_64
           - os: macos-15
             arch: universal2
           - os: macos-15
-            arch: arm64
+            arch: armv8
           - os: ubuntu-latest
-            arch: x64
+            arch: x86_64
           - os: ubuntu-latest
-            arch: x86
+            arch: i686
           - os: ubuntu-24.04-arm
-            arch: arm64
+            arch: aarch64
           - os: ubuntu-latest
             arch: ppc64le
           - os: ubuntu-latest
@@ -90,7 +90,7 @@ jobs:
           -w ${GITHUB_WORKSPACE} \
           --platform linux/${{matrix.arch}} \
           quay.io/pypa/manylinux2014_${{matrix.arch}} \
-          pip wheel . -w wheelhouse_anytag
+          python3.12 -m pip wheel . -w wheelhouse_anytag
       
       - name: auditwheel
         run: |
