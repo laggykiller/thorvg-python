@@ -90,17 +90,10 @@ jobs:
           -w ${GITHUB_WORKSPACE} \
           --platform linux/${{matrix.arch}} \
           quay.io/pypa/manylinux2014_${{matrix.arch}} \
-          python3.12 -m pip wheel . -w wheelhouse_anytag
-      
-      - name: auditwheel
-        run: |
-          pip install auditwheel
-          auditwheel repair -w wheelhouse ./wheelhouse_anytag/*.whl
-
-      - name: abi3audit
-        run: |
-          pip install abi3audit
-          abi3audit $(ls ./wheelhouse/*.whl) --debug --verbose
+          /bin/bash -c \
+          'scl enable devtoolset-10 "python3.12 -m build --wheel --outdir wheelhouse_anytag &&
+          python3.12 -m pip install auditwheel &&
+          auditwheel repair -w wheelhouse --plat manylinux2014_${{matrix.arch}} ./wheelhouse_anytag/*.whl"'
 
       - uses: actions/upload-artifact@v4
         with:

@@ -61,6 +61,7 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
     build = ["missing"]
     options.append("thorvg/*:shared=True")
     options.append("thorvg/*:with_savers=all")
+    options.append("thorvg/*:with_loaders=all")
     options.append("thorvg/*:with_bindings=capi")
 
     print("conan cli settings:")
@@ -101,6 +102,7 @@ def fetch_thorvg(conan_info: Dict[Any, Any]) -> List[str]:
             continue
 
         for cpp_info in dep["cpp_info"].values():
+            print(cpp_info)
             libs = cpp_info.get("libs")
             if libs is None:
                 continue
