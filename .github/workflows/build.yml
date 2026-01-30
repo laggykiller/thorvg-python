@@ -38,48 +38,26 @@ jobs:
         include:
           - os: windows-latest
             arch: x64
-            cibw_archs_windows: AMD64
-            cibw_build: "cp37* pp*"
           - os: windows-latest
             arch: x86
-            cibw_archs_windows: x86
-            cibw_build: "cp37*"
           - os: windows-latest
             arch: arm64
-            cibw_archs_windows: ARM64
-            cibw_build: "cp39*"
           - os: macos-15-intel
             arch: x64
-            cibw_archs_macos: x86_64
-            cibw_build: "cp37* pp*"
           - os: macos-15
             arch: universal2
-            cibw_archs_macos: universal2
-            cibw_build: "cp38* pp*"
           - os: macos-15
             arch: arm64
-            cibw_archs_macos: arm64
-            cibw_build: "cp38* pp*"
           - os: ubuntu-latest
             arch: x64
-            cibw_archs_linux: x86_64
-            cibw_build: "cp37* pp*"
           - os: ubuntu-latest
             arch: x86
-            cibw_archs_linux: i686
-            cibw_build: "cp37* pp*"
           - os: ubuntu-24.04-arm
             arch: arm64
-            cibw_archs_linux: aarch64
-            cibw_build: "cp37* pp*"
           - os: ubuntu-latest
             arch: ppc64le
-            cibw_archs_linux: ppc64le
-            cibw_build: "cp37*"
           - os: ubuntu-latest
             arch: s390x
-            cibw_archs_linux: s390x
-            cibw_build: "cp37*"
 
     steps:
       - uses: actions/setup-python@v5
@@ -95,26 +73,29 @@ jobs:
         uses: docker/setup-qemu-action@v2
         with:
           platforms: all
-
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.17.0
-        env:
-          CIBW_BUILD_FRONTEND: build
-          CIBW_ARCHS_WINDOWS: ${{ matrix.cibw_archs_windows }}
-          CIBW_ARCHS_MACOS: ${{ matrix.cibw_archs_macos }}
-          CIBW_ARCHS_LINUX: ${{ matrix.cibw_archs_linux }}
-          # Required for building with python 3.7-3.10
-          # https://github.com/urllib3/urllib3/issues/2168
-          CIBW_BEFORE_BUILD_LINUX: pip install urllib3~=1.26.20
-          CIBW_BUILD: ${{ matrix.cibw_build }}
-          CIBW_TEST_REQUIRES: pytest
-          CIBW_BEFORE_TEST: pip install --only-binary ":all:" Pillow; true
-          CIBW_BEFORE_TEST_WINDOWS: pip install --only-binary ":all:" Pillow || VER>NUL
-          CIBW_TEST_COMMAND: pytest {package}/tests
-          # Weird bug in pp38-win_amd64 causing test to fail
-          # OSError: [WinError 6] The handle is invalid: 'D:\\System Volume Information'
-          CIBW_TEST_SKIP: "pp*-win_amd64"
       
+      - name: Build wheels
+        if: runner.os != 'Linux'
+        env:
+          TVGPY_COMPILE_TARGET: ${{matrix.arch}}
+        run: |
+          pip wheel . -w wheelhouse_anytag
+
+      - name: Build wheels (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          docker run \
+          --rm \
+          -v $(pwd):/${GITHUB_WORKSPACE} \
+          -w ${GITHUB_WORKSPACE} \
+          --platform linux/${{matrix.arch}} \
+          quay.io/pypa/manylinux2014_${{matrix.arch}} \
+          pip wheel . -w wheelhouse_anytag
+      
+      - name: auditwheel
+          pip install auditwheel
+          auditwheel repair -w wheelhouse ./wheelhouse_anytag/*.whl
+
       - name: abi3audit
         run: |
           pip install abi3audit
