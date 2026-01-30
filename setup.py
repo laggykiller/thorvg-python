@@ -64,7 +64,7 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
         or platform.machine().lower() not in (CONAN_ARCHS["armv8"] + CONAN_ARCHS["x86"])
     ):
         build.append("cmake*")
-    
+
     if build == []:
         build.append("missing")
 
