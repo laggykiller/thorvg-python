@@ -59,11 +59,6 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
 
     settings.append(f"arch={arch}")
 
-    if platform.architecture()[0] == "32bit" or platform.machine().lower() not in (
-        CONAN_ARCHS["armv8"] + CONAN_ARCHS["x86_64"]
-    ):
-        build.append("cmake*")
-
     build.append("missing")
 
     if platform.system() != "Darwin":
@@ -78,7 +73,32 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
     print("build: " + str(build))
     print("options: " + str(options))
 
-    subprocess.run(["conan", "profile", "detect", "-f"])
+    subprocess.run([
+        "conan",
+        "profile",
+        "detect",
+        "-f",
+        "--name",
+        "thorvg_python"
+    ])
+
+    if platform.architecture()[0] == "32bit" or platform.machine().lower() not in (
+        CONAN_ARCHS["armv8"] + CONAN_ARCHS["x86_64"]
+    ):
+        cmake_version_long = subprocess.run(
+            ["cmake", "--version"],
+            stdout=subprocess.PIPE,
+        ).stdout.decode()
+        cmake_version = cmake_version_long.split("\n")[0].split(" ")[2]
+        profile_path = subprocess.run(
+            ["conan", "profile", "path", "thorvg_python"],
+            stdout=subprocess.PIPE,
+        ).stdout.decode()
+
+        with open(profile_path, "a+") as f:
+            f.write("\n")
+            f.write("[platform_tool_requires]\n")
+            f.write(f"cmake/{cmake_version}")
 
     conan_output = os.path.join("conan_output", arch)
 
@@ -93,6 +113,7 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
             conan_output,
             "--deployer=direct_deploy",
             "--format=json",
+            "--profile=thorvg_python",
             ".",
         ],
         stdout=subprocess.PIPE,
