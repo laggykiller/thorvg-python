@@ -41,7 +41,8 @@ def get_arch() -> str:
 def install_thorvg(arch: str) -> Dict[Any, Any]:
     """Install thorvg using Conan."""
     settings: List[str] = []
-    options: list[str] = []
+    options: List[str] = []
+    build: List[str] = []
 
     if platform.system() == "Windows":
         settings.append("os=Windows")
@@ -58,7 +59,15 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
 
     settings.append(f"arch={arch}")
 
-    build = ["missing"]
+    if not shutil.which("cmake") and (
+        platform.architecture()[0] == "32bit"
+        or platform.machine().lower() not in (CONAN_ARCHS["armv8"] + CONAN_ARCHS["x86"])
+    ):
+        build.append("cmake*")
+    
+    if build == []:
+        build.append("missing")
+
     options.append("libwebp/*:with_simd=False")
     options.append("thorvg/*:shared=True")
     options.append("thorvg/*:with_savers=all")
@@ -115,10 +124,11 @@ def fetch_thorvg(conan_info: Dict[Any, Any]) -> List[str]:
                 else:
                     lib_filename = "lib{}.so".format(lib_name)
 
-                libdirs = cpp_info.get("libdirs")
-                if platform.system() == "Windows" and libdirs is None:
-                    libdirs = cpp_info.get("bindirs")
-                if libdirs is None:
+                if platform.system() == "Windows":
+                    libdirs = cpp_info.get("libdirs", []) + cpp_info.get("bindirs", [])
+                else:
+                    libdirs = cpp_info.get("libdirs", [])
+                if libdirs == []:
                     continue
                 for lib_dir in libdirs:
                     lib_path = os.path.join(lib_dir, lib_filename)

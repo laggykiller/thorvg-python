@@ -38,26 +38,37 @@ jobs:
         include:
           - os: windows-latest
             arch: x86_64
+            plat: x86_64
           - os: windows-latest
             arch: x86
+            plat: x86
           - os: windows-latest
             arch: armv8
+            plat: armv8
           - os: macos-15-intel
             arch: x86_64
+            plat: x86_64
           - os: macos-15
             arch: universal2
+            plat: universal2
           - os: macos-15
             arch: armv8
+            plat: armv8
           - os: ubuntu-latest
             arch: x86_64
+            plat: x86_64
           - os: ubuntu-latest
-            arch: i386
+            arch: i686
+            plat: i386
           - os: ubuntu-24.04-arm
             arch: aarch64
+            plat: aarch64
           - os: ubuntu-latest
             arch: ppc64le
+            plat: ppc64le
           - os: ubuntu-latest
             arch: s390x
+            plat: s390x
 
     steps:
       - uses: actions/setup-python@v5
@@ -88,7 +99,7 @@ jobs:
           --rm \
           -v $(pwd):/${GITHUB_WORKSPACE} \
           -w ${GITHUB_WORKSPACE} \
-          --platform linux/${{matrix.arch}} \
+          --platform linux/${{matrix.plat}} \
           quay.io/pypa/manylinux2014_${{matrix.arch}} \
           /bin/bash -c \
           'scl enable devtoolset-10 "python3.12 -m build --wheel --outdir wheelhouse_anytag &&
