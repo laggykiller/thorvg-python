@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 # type: ignore
-import shutil
-
 from conan import ConanFile
 
 
@@ -13,4 +11,4 @@ class ThorvgRecipe(ConanFile):
         build_type = "Release"  # noqa: F841
 
     def build_requirements(self):
-        self.tool_requires("cmake/[>=4.1.2]")
+        self.tool_requires("cmake/[>=3.17, <4]")
