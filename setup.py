@@ -61,7 +61,8 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
 
     if not shutil.which("cmake") and (
         platform.architecture()[0] == "32bit"
-        or platform.machine().lower() not in (CONAN_ARCHS["armv8"] + CONAN_ARCHS["x86_64"])
+        or platform.machine().lower()
+        not in (CONAN_ARCHS["armv8"] + CONAN_ARCHS["x86_64"])
     ):
         build.append("cmake*")
 
