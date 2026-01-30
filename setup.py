@@ -89,25 +89,25 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
     if "thorvg_python" not in profiles:
         subprocess.run(["conan", "profile", "detect", "-f", "--name", "thorvg_python"])
 
-    if platform.architecture()[0] == "32bit" or platform.machine().lower() not in (
-        CONAN_ARCHS["armv8"] + CONAN_ARCHS["x86_64"]
-    ):
-        profile_path = (
-            subprocess.run(
-                ["conan", "profile", "path", "thorvg_python"],
-                stdout=subprocess.PIPE,
+        if platform.architecture()[0] == "32bit" or platform.machine().lower() not in (
+            CONAN_ARCHS["armv8"] + CONAN_ARCHS["x86_64"]
+        ):
+            profile_path = (
+                subprocess.run(
+                    ["conan", "profile", "path", "thorvg_python"],
+                    stdout=subprocess.PIPE,
+                )
+                .stdout.decode()
+                .strip()
             )
-            .stdout.decode()
-            .strip()
-        )
 
-        with open(profile_path, "a+") as f:
-            # https://github.com/conan-io/conan/issues/19179#issuecomment-3472691734
-            f.write("\n")
-            f.write("[platform_tool_requires]\n")
-            f.write("cmake/*\n")
-            f.write("[replace_tool_requires]\n")
-            f.write("cmake/*: cmake/[*]")
+            with open(profile_path, "a+") as f:
+                # https://github.com/conan-io/conan/issues/19179#issuecomment-3472691734
+                f.write("\n")
+                f.write("[platform_tool_requires]\n")
+                f.write("cmake/*\n")
+                f.write("[replace_tool_requires]\n")
+                f.write("cmake/*: cmake/[*]")
 
     conan_output = os.path.join("conan_output", arch)
 
