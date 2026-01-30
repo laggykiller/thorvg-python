@@ -93,6 +93,7 @@ jobs:
           pip wheel . -w wheelhouse_anytag
       
       - name: auditwheel
+        run: |
           pip install auditwheel
           auditwheel repair -w wheelhouse ./wheelhouse_anytag/*.whl
 
