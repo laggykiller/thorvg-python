@@ -61,7 +61,7 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
 
     if not shutil.which("cmake") and (
         platform.architecture()[0] == "32bit"
-        or platform.machine().lower() not in (CONAN_ARCHS["armv8"] + CONAN_ARCHS["x86"])
+        or platform.machine().lower() not in (CONAN_ARCHS["armv8"] + CONAN_ARCHS["x86_64"])
     ):
         build.append("cmake*")
 
@@ -128,15 +128,11 @@ def fetch_thorvg(conan_info: Dict[Any, Any]) -> List[str]:
                     libdirs = cpp_info.get("libdirs", []) + cpp_info.get("bindirs", [])
                 else:
                     libdirs = cpp_info.get("libdirs", [])
-                if libdirs == []:
-                    continue
                 for lib_dir in libdirs:
                     lib_path = os.path.join(lib_dir, lib_filename)
                     lib_path = lib_path.replace(os.path.dirname(__file__), ".")
                     if os.path.isfile(lib_path):
                         lib_paths.append(lib_path)
-                    else:
-                        lib_paths.append(lib_name)
 
     return lib_paths
 
@@ -150,6 +146,7 @@ def compile():
         lib_paths = fetch_thorvg(conan_info)
         conan_info = install_thorvg("armv8")
         lib_paths.extend(fetch_thorvg(conan_info))
+        print(f"{lib_paths=}")
         subprocess.run(
             [
                 "python3",
