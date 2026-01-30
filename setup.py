@@ -149,6 +149,7 @@ def compile():
     else:
         conan_info = install_thorvg(arch)
         lib_paths = fetch_thorvg(conan_info)
+        print(f"{lib_paths=}")
         for lib_path in lib_paths:
             shutil.copy(lib_path, "src/thorvg_python/")
 
