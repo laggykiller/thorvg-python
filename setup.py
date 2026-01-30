@@ -59,6 +59,7 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
     settings.append(f"arch={arch}")
 
     build = ["missing"]
+    options.append("libwebp/*:with_simd=False")
     options.append("thorvg/*:shared=True")
     options.append("thorvg/*:with_savers=all")
     options.append("thorvg/*:with_loaders=all")
@@ -102,7 +103,6 @@ def fetch_thorvg(conan_info: Dict[Any, Any]) -> List[str]:
             continue
 
         for cpp_info in dep["cpp_info"].values():
-            print(cpp_info)
             libs = cpp_info.get("libs")
             if libs is None:
                 continue
@@ -116,6 +116,8 @@ def fetch_thorvg(conan_info: Dict[Any, Any]) -> List[str]:
                     lib_filename = "lib{}.so".format(lib_name)
 
                 libdirs = cpp_info.get("libdirs")
+                if platform.system() == "Windows" and libdirs is None:
+                    libdirs = cpp_info.get("bindirs")
                 if libdirs is None:
                     continue
                 for lib_dir in libdirs:
