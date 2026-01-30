@@ -102,7 +102,9 @@ jobs:
           --platform linux/${{matrix.plat}} \
           quay.io/pypa/manylinux2014_${{matrix.arch}} \
           /bin/bash -c \
-          'scl enable devtoolset-10 "python3.12 -m build --wheel --outdir wheelhouse_anytag &&
+          'scl enable devtoolset-10 "
+          yum -y install cmake &&
+          python3.12 -m build --wheel --outdir wheelhouse_anytag &&
           python3.12 -m pip install auditwheel &&
           auditwheel repair -w wheelhouse --plat manylinux2014_${{matrix.arch}} ./wheelhouse_anytag/*.whl"'
 

@@ -13,5 +13,4 @@ class ThorvgRecipe(ConanFile):
         build_type = "Release"  # noqa: F841
 
     def build_requirements(self):
-        if not shutil.which("cmake"):
-            self.tool_requires("cmake/[>=3.27]")
+        self.tool_requires("cmake/[>=4.1.2]")
