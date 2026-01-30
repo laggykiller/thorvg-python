@@ -64,8 +64,7 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
     ):
         build.append("cmake*")
 
-    if build == []:
-        build.append("missing")
+    build.append("missing")
 
     if platform.system() != "Darwin":
         options.append("libwebp/*:with_simd=False")
