@@ -178,12 +178,12 @@ def compile():
         print(f"{lib_paths=}")
         subprocess.run(
             [
-                "python3",
-                "-m",
-                "lipomerge",
+                "lipo",
+                "-create",
                 lib_paths[0],
                 lib_paths[1],
-                "src/thorvg_python/",
+                "-output",
+                "src/thorvg_python/libthorvg.dylib",
             ]
         )
     else:

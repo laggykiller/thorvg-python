@@ -38,22 +38,22 @@ jobs:
         include:
           - os: windows-latest
             arch: x86_64
-            plat: x86_64
+            plat: win_amd64
           - os: windows-latest
             arch: x86
-            plat: x86
+            plat: win32
           - os: windows-latest
             arch: armv8
-            plat: armv8
+            plat: win_arm64
           - os: macos-15-intel
             arch: x86_64
-            plat: x86_64
+            plat: macosx_10_9_x86_64
           - os: macos-15
             arch: universal2
-            plat: universal2
+            plat: macosx_10_9_universal2
           - os: macos-15
             arch: armv8
-            plat: armv8
+            plat: macosx_11_0_arm64
           - os: ubuntu-latest
             arch: x86_64
             plat: x86_64
@@ -84,13 +84,16 @@ jobs:
         uses: docker/setup-qemu-action@v2
         with:
           platforms: all
-      
+
       - name: Build wheels
         if: runner.os != 'Linux'
         env:
           TVGPY_COMPILE_TARGET: ${{matrix.arch}}
         run: |
-          pip wheel . -w wheelhouse
+          pip install build wheel
+          python -m build --wheel --outdir wheelhouse
+          python -m wheel tags --platform-tag ${{matrix.plat}} ./wheelhouse/*.whl
+          rm ./wheelhouse/*-none-any.whl
           pip install ./wheelhouse/*.whl Pillow pytest
           pytest
 
@@ -108,7 +111,7 @@ jobs:
           python3.12 -m build --wheel --outdir wheelhouse_anytag &&
           python3.12 -m pip install auditwheel &&
           auditwheel repair -w wheelhouse --plat manylinux2014_${{matrix.arch}} ./wheelhouse_anytag/*.whl" &&
-          pip install ./wheelhouse/*.whl Pillow pytest &&
+          python3.12 -m pip install ./wheelhouse/*.whl Pillow pytest &&
           pytest
           '
 
