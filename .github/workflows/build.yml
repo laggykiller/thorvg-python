@@ -90,7 +90,9 @@ jobs:
         env:
           TVGPY_COMPILE_TARGET: ${{matrix.arch}}
         run: |
-          pip wheel . -w wheelhouse_anytag
+          pip wheel . -w wheelhouse
+          pip install ./wheelhouse/*.whl Pillow pytest
+          pytest
 
       - name: Build wheels (Linux)
         if: runner.os == 'Linux'
@@ -105,7 +107,10 @@ jobs:
           'scl enable devtoolset-10 "
           python3.12 -m build --wheel --outdir wheelhouse_anytag &&
           python3.12 -m pip install auditwheel &&
-          auditwheel repair -w wheelhouse --plat manylinux2014_${{matrix.arch}} ./wheelhouse_anytag/*.whl"'
+          auditwheel repair -w wheelhouse --plat manylinux2014_${{matrix.arch}} ./wheelhouse_anytag/*.whl" &&
+          pip install ./wheelhouse/*.whl Pillow pytest &&
+          pytest
+          '
 
       - uses: actions/upload-artifact@v4
         with:
