@@ -70,18 +70,24 @@ class Text(Paint):
                 text.set_font(None, 24, None)
         """
         if name is not None and name != "":
-            name_arr_type = ctypes.c_char * len(name.encode())
+            name_bytes = name.encode()
+            if name_bytes[-1] != 0:
+                name_bytes += b"\x00"
+            name_arr_type = ctypes.c_char * len(name_bytes)
             name_arr_type_ptr = ctypes.POINTER(name_arr_type)
-            name_arr = name_arr_type.from_buffer_copy(name.encode())
+            name_arr = name_arr_type.from_buffer_copy(name_bytes)
             name_arr_ptr = ctypes.pointer(name_arr)
         else:
             name_arr_type_ptr = ctypes.c_void_p  # type: ignore
             name_arr_ptr = ctypes.c_void_p()  # type: ignore
 
         if style is not None and style != "":
-            style_arr_type = ctypes.c_char * len(style.encode())
+            style_bytes = style.encode()
+            if style_bytes[-1] != 0:
+                style_bytes += b"\x00"
+            style_arr_type = ctypes.c_char * len(style_bytes)
             style_arr_type_ptr = ctypes.POINTER(style_arr_type)
-            style_arr = style_arr_type.from_buffer_copy(style.encode())
+            style_arr = style_arr_type.from_buffer_copy(style_bytes)
             style_arr_ptr = ctypes.pointer(style_arr)
         else:
             style_arr_type_ptr = ctypes.c_void_p  # type: ignore
@@ -118,8 +124,11 @@ class Text(Paint):
         .. note::
             Experimental API
         """
-        text_arr_type = ctypes.c_char * len(text.encode())
-        text_arr = text_arr_type.from_buffer_copy(text.encode())
+        text_bytes = text.encode()
+        if text_bytes[-1] != 0:
+            text_bytes += b"\x00"
+        text_arr_type = ctypes.c_char * len(text_bytes)
+        text_arr = text_arr_type.from_buffer_copy(text_bytes)
         self.thorvg_lib.tvg_text_set_text.argtypes = [
             ctypes.POINTER(PaintStruct),
             ctypes.POINTER(text_arr_type),
