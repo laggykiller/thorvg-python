@@ -659,7 +659,9 @@ def test_picture_load_raw_copy_true():
 
 
 @pytest.mark.skipif(PILLOW_LOADED is False, reason="Pillow not installed")
-@pytest.mark.skipif(platform.system() == "Windows", reason="Known failure if on Windows")
+@pytest.mark.skipif(
+    platform.system() == "Windows", reason="Known failure if on Windows"
+)
 def test_picture_load_raw_copy_false():
     _test_picture_load_raw("test.png", "test_picture_png_ref.png", False)
 
