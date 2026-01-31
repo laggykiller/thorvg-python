@@ -120,7 +120,7 @@ jobs:
           python3.12 -m pip install --root-user-action=ignore auditwheel &&
           auditwheel repair -w wheelhouse --plat manylinux2014_${{matrix.arch}} ./wheelhouse_anytag/*.whl" &&
           python3.12 -m pip install --root-user-action=ignore ./wheelhouse/*.whl Pillow pytest &&
-          pytest
+          python3.12 -m pytest
           '
 
       - uses: actions/upload-artifact@v4
