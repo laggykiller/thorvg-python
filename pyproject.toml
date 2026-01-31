@@ -7,7 +7,7 @@ authors = [{ "name" = "chaudominic", "email" = "chaudominic2@gmail.com" }]
 keywords = ["thorvg", "lottie", "svg", "ctypes", "python"]
 classifiers = ["Topic :: Multimedia :: Graphics"]
 dependencies = []
-version = "1.0.0"
+version = "1.0.1"
 
 [project.urls]
 Repository = "https://github.com/laggykiller/thorvg-python"

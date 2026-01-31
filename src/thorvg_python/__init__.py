@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """thorvg-python"""
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 from .animation import Animation  # type: ignore  # noqa: F401
 from .animation.lottie import LottieAnimation  # type: ignore  # noqa: F401
