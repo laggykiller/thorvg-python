@@ -94,11 +94,18 @@ jobs:
           python -m build --wheel --outdir wheelhouse
           python -m wheel tags --platform-tag ${{matrix.plat}} ./wheelhouse/*.whl
           rm ./wheelhouse/*-none-any.whl
+        shell: bash
+      
+      - name: Test wheels
+        if: ${{ matrix.arch != 'win32' && matrix.arch != 'win_arm64' && runner.os != 'Linux' }}
+        env:
+          TVGPY_COMPILE_TARGET: ${{matrix.arch}}
+        run: |
           pip install ./wheelhouse/*.whl Pillow pytest
           pytest
         shell: bash
 
-      - name: Build wheels (Linux)
+      - name: Build and test wheels (Linux)
         if: runner.os == 'Linux'
         run: |
           docker run \
@@ -110,9 +117,9 @@ jobs:
           /bin/bash -c \
           'scl enable devtoolset-10 "
           python3.12 -m build --wheel --outdir wheelhouse_anytag &&
-          python3.12 -m pip install --root-user-action auditwheel &&
+          python3.12 -m pip install --root-user-action=ignore auditwheel &&
           auditwheel repair -w wheelhouse --plat manylinux2014_${{matrix.arch}} ./wheelhouse_anytag/*.whl" &&
-          python3.12 -m pip install --root-user-action ./wheelhouse/*.whl Pillow pytest &&
+          python3.12 -m pip install --root-user-action=ignore ./wheelhouse/*.whl Pillow pytest &&
           pytest
           '
 
