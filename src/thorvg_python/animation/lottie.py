@@ -55,9 +55,12 @@ class LottieAnimation(Animation):
             Experimental API
         """
         if slot is not None and slot != "":
-            slot_arr_type = ctypes.c_char * len(slot.encode())
+            slot_bytes = slot.encode()
+            if slot_bytes[-1] != 0:
+                slot_bytes += b"\x00"
+            slot_arr_type = ctypes.c_char * len(slot_bytes)
             slot_arr_type_ptr = ctypes.POINTER(slot_arr_type)
-            slot_arr_ptr = ctypes.pointer(slot_arr_type.from_buffer_copy(slot.encode()))
+            slot_arr_ptr = ctypes.pointer(slot_arr_type.from_buffer_copy(slot_bytes))
         else:
             slot_arr_type_ptr = ctypes.c_void_p  # type: ignore
             slot_arr_ptr = ctypes.c_void_p()  # type: ignore
@@ -88,8 +91,11 @@ class LottieAnimation(Animation):
         .. note::
             Experimental API
         """
-        marker_arr_type = ctypes.c_char * len(marker.encode())
-        marker_arr = marker_arr_type.from_buffer_copy(marker.encode())
+        marker_bytes = marker.encode()
+        if marker_bytes[-1] != 0:
+            marker_bytes += b"\x00"
+        marker_arr_type = ctypes.c_char * len(marker_bytes)
+        marker_arr = marker_arr_type.from_buffer_copy(marker_bytes)
         self.thorvg_lib.tvg_lottie_animation_set_marker.argtypes = [
             ctypes.POINTER(AnimationStruct),
             ctypes.POINTER(marker_arr_type),

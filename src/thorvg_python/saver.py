@@ -62,8 +62,11 @@ class Saver:
             Saving can be asynchronous if the assigned thread number is greater than zero. To guarantee the saving is done, call Saver.sync() afterwards.
         .. seealso:: Saver.sync()
         """
+        path_bytes = path.encode()
+        if path_bytes[-1] != 0:
+            path_bytes += b"\x00"
         path_arr_type = ctypes.c_char * len(path)
-        path_arr = path_arr_type.from_buffer_copy(path.encode())
+        path_arr = path_arr_type.from_buffer_copy(path_bytes)
         self.thorvg_lib.tvg_saver_save.argtypes = [
             ctypes.POINTER(SaverStruct),
             ctypes.POINTER(PaintStruct),
