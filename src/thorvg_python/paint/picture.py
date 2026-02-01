@@ -50,9 +50,7 @@ class Picture(Paint):
             - NOT_SUPPORTED A file with an unknown extension.
         :rtype: Result
         """
-        path_bytes = path.encode()
-        if path_bytes[-1] != 0:
-            path_bytes += b"\x00"
+        path_bytes = path.encode() + b"\x00"
         path_char = ctypes.create_string_buffer(path_bytes)
         self.thorvg_lib.tvg_picture_load.argtypes = [
             ctypes.POINTER(PaintStruct),
@@ -127,9 +125,7 @@ class Picture(Paint):
         .. warning::
             : It's the user responsibility to release the ``data`` memory if the ``copy`` is ``true``.
         """
-        mimetype_bytes = mimetype.encode()
-        if mimetype_bytes[-1] != 0:
-            mimetype_bytes += b"\x00"
+        mimetype_bytes = mimetype.encode() + b"\x00"
         data_arr_type = ctypes.c_char * len(data)
         data_arr = data_arr_type.from_buffer_copy(data)
         mimetype_char_type = ctypes.c_char * len(mimetype_bytes)

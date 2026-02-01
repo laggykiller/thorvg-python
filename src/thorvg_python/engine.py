@@ -245,9 +245,7 @@ class Engine:
 
         .. versionadded:: 0.15
         """
-        path_bytes = path.encode()
-        if path_bytes[-1] != 0:
-            path_bytes += b"\x00"
+        path_bytes = path.encode() + b"\x00"
         path_arr_type = ctypes.c_char * len(path_bytes)
         path_arr = path_arr_type.from_buffer_copy(path_bytes)
         self.thorvg_lib.tvg_font_load.argtypes = [
@@ -288,17 +286,14 @@ class Engine:
 
         .. versionadded:: 0.15
         """
-        name_bytes = name.encode()
-        if name_bytes[-1] != 0:
-            name_bytes += b"\x00"
+        name_bytes = name.encode() + b"\x00"
+        name_bytes += b"\x00"
         name_char_type = ctypes.c_char * len(name_bytes)
         name_char = name_char_type.from_buffer_copy(name_bytes)
         data_arr_type = ctypes.c_ubyte * len(data)
         data_arr = data_arr_type.from_buffer_copy(data)
         if mimetype is not None and mimetype != "":
-            mimetype_bytes = name.encode()
-            if mimetype_bytes[-1] != 0:
-                mimetype_bytes += b"\x00"
+            mimetype_bytes = name.encode() + b"\x00"
             mimetype_char_type = ctypes.c_char * len(mimetype_bytes)
             mimetype_char_ptr_type = ctypes.POINTER(mimetype_char_type)
             mimetype_char = mimetype_char_type.from_buffer_copy(mimetype_bytes)
@@ -340,9 +335,7 @@ class Engine:
 
         .. versionadded:: 0.15
         """
-        path_bytes = path.encode()
-        if path_bytes[-1] != 0:
-            path_bytes += b"\x00"
+        path_bytes = path.encode() + b"\x00"
         path_arr_type = ctypes.c_char * len(path_bytes)
         path_arr = path_arr_type.from_buffer_copy(path_bytes)
         self.thorvg_lib.tvg_font_unload.argtypes = [
@@ -368,9 +361,7 @@ class Engine:
         .. note::
             Experimental API
         """
-        name_bytes = name.encode()
-        if name_bytes[-1] != 0:
-            name_bytes += b"\x00"
+        name_bytes = name.encode() + b"\x00"
         name_char_type = ctypes.c_char * len(name_bytes)
         name_char = name_char_type.from_buffer_copy(name_bytes)
         self.thorvg_lib.tvg_accessor_generate_id.argtypes = [
