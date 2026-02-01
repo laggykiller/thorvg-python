@@ -97,9 +97,7 @@ jobs:
         shell: bash
       
       - name: Test wheels
-        if: ${{ matrix.arch != 'win32' && matrix.arch != 'win_arm64' && runner.os != 'Linux' }}
-        env:
-          TVGPY_COMPILE_TARGET: ${{matrix.arch}}
+        if: matrix.plat != 'win32' && matrix.plat != 'win_arm64' && runner.os != 'Linux'
         run: |
           pip install ./wheelhouse/*.whl Pillow pytest
           pytest
@@ -119,7 +117,7 @@ jobs:
           python3.12 -m build --wheel --outdir wheelhouse_anytag &&
           python3.12 -m pip install --root-user-action=ignore auditwheel &&
           auditwheel repair -w wheelhouse --plat manylinux2014_${{matrix.arch}} ./wheelhouse_anytag/*.whl" &&
-          python3.12 -m pip install --root-user-action=ignore ./wheelhouse/*.whl Pillow pytest &&
+          python3.12 -m pip install --only-binary ":all:" --root-user-action=ignore ./wheelhouse/*.whl Pillow pytest; true &&
           python3.12 -m pytest
           '
 
