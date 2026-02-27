@@ -5,7 +5,7 @@ from conan.errors import ConanInvalidConfiguration
 from conan.tools.apple import fix_apple_shared_install_name
 from conan.tools.build import check_min_cppstd
 from conan.tools.env import VirtualBuildEnv
-from conan.tools.files import copy, get, rmdir, rename, replace_in_file, rm
+from conan.tools.files import copy, get, rename, replace_in_file, rm, rmdir
 from conan.tools.gnu import PkgConfigDeps
 from conan.tools.layout import basic_layout
 from conan.tools.meson import Meson, MesonToolchain
@@ -27,11 +27,11 @@ class ThorvgConan(ConanFile):
     options = {
         "shared": [True, False],
         "fPIC": [True, False],
-        "with_engines": ['sw', "gl", "wg", "all"],
-        "with_loaders": [False, 'svg', 'png', 'jpg', 'lottie', 'ttf', 'webp', 'all'],
-        "with_savers": [False, 'gif', 'all'],
-        "with_bindings": [False, 'capi'],
-        "with_tools": [False, 'svg2png', 'lottie2gif', 'all'],
+        "with_engines": ["sw", "gl", "wg", "all"],
+        "with_loaders": [False, "svg", "png", "jpg", "lottie", "ttf", "webp", "all"],
+        "with_savers": [False, "gif", "all"],
+        "with_bindings": [False, "capi"],
+        "with_tools": [False, "svg2png", "lottie2gif", "all"],
         "with_threads": [True, False],
         "with_simd": [True, False],
         "with_lottie_exp": [False, True],
@@ -42,10 +42,10 @@ class ThorvgConan(ConanFile):
     default_options = {
         "shared": False,
         "fPIC": True,
-        "with_engines": 'sw',
-        "with_loaders": 'all',
+        "with_engines": "sw",
+        "with_loaders": "all",
         "with_savers": False,
-        "with_bindings": 'capi',
+        "with_bindings": "capi",
         "with_tools": False,
         "with_threads": True,
         "with_simd": False,
@@ -97,8 +97,13 @@ class ThorvgConan(ConanFile):
     def validate(self):
         if self.settings.compiler.get_safe("cppstd"):
             check_min_cppstd(self, self._min_cppstd)
-        minimum_version = self._compilers_minimum_version.get(str(self.settings.compiler), False)
-        if minimum_version and Version(self.settings.compiler.version) < minimum_version:
+        minimum_version = self._compilers_minimum_version.get(
+            str(self.settings.compiler), False
+        )
+        if (
+            minimum_version
+            and Version(self.settings.compiler.version) < minimum_version
+        ):
             raise ConanInvalidConfiguration(
                 f"{self.ref} requires C++{self._min_cppstd}, which your compiler does not support."
             )
@@ -131,16 +136,26 @@ class ThorvgConan(ConanFile):
     def generate(self):
         tc = MesonToolchain(self, backend=("vs" if is_msvc(self) else None))
         is_debug = self.settings.get_safe("build_type") == "Debug"
-        tc.project_options.update({
-            "engines": str(self.options.with_engines),
-            "loaders": str(self.options.with_loaders) if self.options.with_loaders else '',
-            "savers": str(self.options.with_savers) if self.options.with_savers else '',
-            "bindings": str(self.options.with_bindings) if self.options.with_bindings else '',
-            "tools": str(self.options.with_tools )if self.options.with_tools else '',
-            "threads": bool(self.options.with_threads),
-            "tests": False,
-            "log": is_debug,
-        })
+        tc.project_options.update(
+            {
+                "engines": str(self.options.with_engines),
+                "loaders": str(self.options.with_loaders)
+                if self.options.with_loaders
+                else "",
+                "savers": str(self.options.with_savers)
+                if self.options.with_savers
+                else "",
+                "bindings": str(self.options.with_bindings)
+                if self.options.with_bindings
+                else "",
+                "tools": str(self.options.with_tools)
+                if self.options.with_tools
+                else "",
+                "threads": bool(self.options.with_threads),
+                "tests": False,
+                "log": is_debug,
+            }
+        )
         # Workaround to avoid: error D8016: '/O1' and '/RTC1' command-line options are incompatible
         if is_msvc(self) and is_debug:
             tc.project_options["optimization"] = "plain"
@@ -165,7 +180,12 @@ class ThorvgConan(ConanFile):
     def _patch_sources(self):
         # Workaround to avoid: Stripping target 'src\\thorvg-0.dll'.
         if is_msvc(self) and self.options.shared:
-            replace_in_file(self, os.path.join(self.source_folder, "meson.build"), ", 'strip=true'", "")
+            replace_in_file(
+                self,
+                os.path.join(self.source_folder, "meson.build"),
+                ", 'strip=true'",
+                "",
+            )
 
     def build(self):
         self._patch_sources()
@@ -174,7 +194,12 @@ class ThorvgConan(ConanFile):
         meson.build()
 
     def package(self):
-        copy(self, pattern="LICENSE", dst=os.path.join(self.package_folder, "licenses"), src=self.source_folder)
+        copy(
+            self,
+            pattern="LICENSE",
+            dst=os.path.join(self.package_folder, "licenses"),
+            src=self.source_folder,
+        )
         meson = Meson(self)
         meson.install()
         rmdir(self, os.path.join(self.package_folder, "lib", "pkgconfig"))
@@ -182,7 +207,11 @@ class ThorvgConan(ConanFile):
         fix_apple_shared_install_name(self)
 
         if is_msvc(self) and not self.options.shared:
-            rename(self, os.path.join(self.package_folder, "lib", "libthorvg.a"), os.path.join(self.package_folder, "lib", "thorvg.lib"))
+            rename(
+                self,
+                os.path.join(self.package_folder, "lib", "libthorvg.a"),
+                os.path.join(self.package_folder, "lib", "thorvg.lib"),
+            )
 
     def package_info(self):
         self.cpp_info.libs = ["thorvg-1"]

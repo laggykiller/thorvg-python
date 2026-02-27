@@ -2,8 +2,15 @@
 import ctypes
 from typing import Optional, Tuple
 
-from ..base import (BlendMethod, MaskMethod, Matrix, PaintPointer, PointStruct,
-                    Result, TvgType)
+from ..base import (
+    BlendMethod,
+    MaskMethod,
+    Matrix,
+    PaintPointer,
+    PointStruct,
+    Result,
+    TvgType,
+)
 from ..engine import Engine
 
 
@@ -510,9 +517,7 @@ class Paint:
             self._paint, target._paint, method
         )
 
-    def get_mask_method(
-        self, target: "Paint"
-    ) -> Tuple[Result, MaskMethod]:
+    def get_mask_method(self, target: "Paint") -> Tuple[Result, MaskMethod]:
         """Gets the masking target object and the masking method.
 
         :return: Result.INVALID_ARGUMENT A ``None`` is passed as the argument.

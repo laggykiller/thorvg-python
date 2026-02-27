@@ -478,16 +478,18 @@ class TextMetrics(ctypes.Structure):
     .. note::
         Experimental API
     """
+
     _fields_ = [
         ("ascent", ctypes.c_float),
         ("descent", ctypes.c_float),
         ("linegap", ctypes.c_float),
         ("advance", ctypes.c_float),
     ]
-    ascent: float #: Distance from the baseline to the top of the highest glyph (usually positive).
-    descent: float #: Distance from the baseline to the bottom of the lowest glyph (usually negative, as in TTF).
-    linegap: float #: Additional spacing recommended between lines (leading).
-    advance: float #: The total vertical advance between lines of text: ascent - descent + linegap (i.e., ascent + |descent| + linegap when descent is negative).
+    ascent: float  #: Distance from the baseline to the top of the highest glyph (usually positive).
+    descent: float  #: Distance from the baseline to the bottom of the lowest glyph (usually negative, as in TTF).
+    linegap: float  #: Additional spacing recommended between lines (leading).
+    advance: float  #: The total vertical advance between lines of text: ascent - descent + linegap (i.e., ascent + |descent| + linegap when descent is negative).
+
 
 """Callback function type for resolving external assets.
 

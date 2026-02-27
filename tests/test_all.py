@@ -35,9 +35,7 @@ def test_engine():
     assert engine.term() == tvg.Result.SUCCESS
 
 
-def _test_swcanvas(
-    cs: tvg.Colorspace, op: tvg.EngineOption, with_stride: bool
-):
+def _test_swcanvas(cs: tvg.Colorspace, op: tvg.EngineOption, with_stride: bool):
     engine = tvg.Engine()
     canvas = tvg.SwCanvas(engine, op)
     if with_stride:
@@ -328,9 +326,7 @@ def test_paint():
     assert matrix_list == matrix_out_list
 
     shape2 = tvg.Shape(engine)
-    assert (
-        shape.set_mask_method(shape2, tvg.MaskMethod.ALPHA) == tvg.Result.SUCCESS
-    )
+    assert shape.set_mask_method(shape2, tvg.MaskMethod.ALPHA) == tvg.Result.SUCCESS
     result, method = shape.get_mask_method(shape2)
     assert result == tvg.Result.SUCCESS
     assert method == tvg.MaskMethod.ALPHA
@@ -564,7 +560,10 @@ def _test_picture_load_raw(test_file: str, ref: str, copy: bool):
         im_bytes = im.tobytes()  # type: ignore
 
     picture = tvg.Picture(engine)
-    assert picture.load_raw(im_bytes, im_w, im_h, tvg.Colorspace.ABGR8888, copy) == tvg.Result.SUCCESS
+    assert (
+        picture.load_raw(im_bytes, im_w, im_h, tvg.Colorspace.ABGR8888, copy)
+        == tvg.Result.SUCCESS
+    )
     if copy is True:
         del im_bytes
     assert picture.set_size(256, 256) == tvg.Result.SUCCESS

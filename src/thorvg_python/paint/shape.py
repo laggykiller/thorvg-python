@@ -2,8 +2,17 @@
 import ctypes
 from typing import Optional, Sequence, Tuple, Union
 
-from ..base import (FillRule, GradientPointer, PaintPointer, PathCommand,
-                    PointStruct, Result, StrokeCap, StrokeJoin, TvgType)
+from ..base import (
+    FillRule,
+    GradientPointer,
+    PaintPointer,
+    PathCommand,
+    PointStruct,
+    Result,
+    StrokeCap,
+    StrokeJoin,
+    TvgType,
+)
 from ..engine import Engine
 from ..gradient import Gradient
 from ..gradient.linear import LinearGradient

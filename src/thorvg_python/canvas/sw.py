@@ -21,7 +21,7 @@ class SwCanvas(Canvas):
         self,
         engine: Engine,
         op: EngineOption = EngineOption.DEFAULT,
-        canvas: Optional[CanvasPointer] = None
+        canvas: Optional[CanvasPointer] = None,
     ):
         self.engine = engine
         self.thorvg_lib = engine.thorvg_lib

@@ -388,7 +388,7 @@ class Text(Paint):
             self._paint,
             gradient._grad,  # type: ignore
         )
-    
+
     def get_metrics(self) -> Tuple[Result, TextMetrics]:
         """Retrieves the layout metrics of the text object.
 
@@ -402,7 +402,7 @@ class Text(Paint):
         :rtype: TextMetrics
         :return: TVG_RESULT_INSUFFICIENT_CONDITION if no font or size has been set yet.
         :rtype: Result
-        
+
         .. seealso:: TextMetrics
         .. note::
             Experimental API
