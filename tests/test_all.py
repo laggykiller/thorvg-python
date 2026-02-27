@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 def check_im_same(im: "Image.Image", im_ref_name: str):
     from PIL import Image, ImageChops
 
+    # im.save(os.path.join(ref_dir, im_ref_name))
     im_ref = Image.open(os.path.join(ref_dir, im_ref_name))
     return ImageChops.difference(im_ref, im).getbbox() is None
 
@@ -318,10 +319,10 @@ def test_paint():
     assert matrix_list == matrix_out_list
 
     shape2 = tvg.Shape(engine)
-    assert shape.set_mask_method(shape2, tvg.MaskMethod.ALPHA) == tvg.Result.SUCCESS
+    assert shape.set_mask_method(shape2, tvg.MaskMethod.DARKEN) == tvg.Result.SUCCESS
     result, method = shape.get_mask_method(shape2)
     assert result == tvg.Result.SUCCESS
-    assert method == tvg.MaskMethod.ALPHA
+    assert method == tvg.MaskMethod.DARKEN
 
     shape3 = tvg.Shape(engine)
     assert shape.set_clip(shape3) == tvg.Result.SUCCESS
@@ -349,8 +350,8 @@ def test_stroke():
     assert line.set_fill_color(150, 150, 255, 100) == tvg.Result.SUCCESS
     assert line.set_stroke_width(5) == tvg.Result.SUCCESS
     assert line.set_stroke_color(32, 64, 128, 100) == tvg.Result.SUCCESS
-    assert line.set_stroke_cap(tvg.StrokeCap.ROUND) == tvg.Result.SUCCESS
-    assert line.set_stroke_join(tvg.StrokeJoin.MITER) == tvg.Result.SUCCESS
+    assert line.set_stroke_cap(tvg.StrokeCap.SQUARE) == tvg.Result.SUCCESS
+    assert line.set_stroke_join(tvg.StrokeJoin.BEVEL) == tvg.Result.SUCCESS
     assert line.set_stroke_miterlimit(3.0) == tvg.Result.SUCCESS
     pattern = [7.0, 10.0]
     assert line.set_stroke_dash(pattern, 0) == tvg.Result.SUCCESS
@@ -365,9 +366,9 @@ def test_stroke():
 
     assert line.get_stroke_width() == (tvg.Result.SUCCESS, 5.0)
     assert line.get_stroke_color() == (tvg.Result.SUCCESS, 32, 64, 128, 100)
-    assert line.get_stroke_cap() == (tvg.Result.SUCCESS, tvg.StrokeCap.ROUND)
+    assert line.get_stroke_cap() == (tvg.Result.SUCCESS, tvg.StrokeCap.SQUARE)
     assert line.get_stroke_dash() == (tvg.Result.SUCCESS, pattern, 0.0)
-    assert line.get_stroke_join() == (tvg.Result.SUCCESS, tvg.StrokeJoin.MITER)
+    assert line.get_stroke_join() == (tvg.Result.SUCCESS, tvg.StrokeJoin.BEVEL)
     assert line.get_stroke_miterlimit() == (tvg.Result.SUCCESS, 3.0)
 
     assert canvas.destroy() == tvg.Result.SUCCESS
@@ -435,7 +436,7 @@ def _test_gradient(gradient_type: str):
         raise RuntimeError(f"Invalid fill type {type(fill)}")
 
     assert fill.set_color_stops(color_stops) == tvg.Result.SUCCESS
-    assert fill.set_spread(tvg.StrokeFill.REFLECT) == tvg.Result.SUCCESS
+    assert fill.set_spread(tvg.StrokeFill.REPEAT) == tvg.Result.SUCCESS
     assert fill.set_transform(matrix) == tvg.Result.SUCCESS
     assert shape.set_gradient(fill) == tvg.Result.SUCCESS
     assert canvas.add(shape) == tvg.Result.SUCCESS
@@ -466,7 +467,7 @@ def _test_gradient(gradient_type: str):
         color_stops_out_list.append((j.offset, j.r, j.g, j.b, j.a))
     assert color_stops_list == color_stops_out_list
 
-    assert fill_out.get_spread() == (tvg.Result.SUCCESS, tvg.StrokeFill.REFLECT)
+    assert fill_out.get_spread() == (tvg.Result.SUCCESS, tvg.StrokeFill.REPEAT)
 
     transform_result, matrix_out = fill_out.get_transform()
     assert transform_result == tvg.Result.SUCCESS
@@ -556,8 +557,6 @@ def _test_picture_load_raw(test_file: str, ref: str, copy: bool):
         picture.load_raw(im_bytes, im_w, im_h, tvg.Colorspace.ABGR8888, copy)
         == tvg.Result.SUCCESS
     )
-    if copy is True:
-        del im_bytes
     assert picture.set_size(256, 256) == tvg.Result.SUCCESS
     assert picture.translate(0, 0) == tvg.Result.SUCCESS
     assert canvas.add(picture) == tvg.Result.SUCCESS
@@ -750,6 +749,7 @@ def _test_text(font: str, unicode: bool):
         == tvg.Result.SUCCESS
     )
     assert text1.set_color(0, 0, 0) == tvg.Result.SUCCESS
+    assert text1.wrap_mode(tvg.TextWrap.ELLIPSIS) == tvg.Result.SUCCESS
     assert text1.translate(10, 10) == tvg.Result.SUCCESS
     assert canvas.add(text1) == tvg.Result.SUCCESS
 
