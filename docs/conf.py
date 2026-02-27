@@ -33,8 +33,8 @@ napoleon_use_ivar = True
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
-autoapi_type = 'python'
-autoapi_dirs = ['../src/thorvg_python']
+autoapi_type = "python"
+autoapi_dirs = ["../src/thorvg_python"]
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

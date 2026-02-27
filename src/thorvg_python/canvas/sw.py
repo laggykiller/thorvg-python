@@ -51,7 +51,7 @@ class SwCanvas(Canvas):
 
         .. seealso:: EngineOption
         """
-        self.thorvg_lib.tvg_swcanvas_create.argtypes = [ctypes.c_int]
+        self.thorvg_lib.tvg_swcanvas_create.argtypes = [ctypes.c_uint8]
         self.thorvg_lib.tvg_swcanvas_create.restype = CanvasPointer
         return self.thorvg_lib.tvg_swcanvas_create(op)
 
@@ -97,7 +97,7 @@ class SwCanvas(Canvas):
             ctypes.c_uint32,
             ctypes.c_uint32,
             ctypes.c_uint32,
-            ctypes.c_int,
+            ctypes.c_uint8,
         ]
         self.thorvg_lib.tvg_swcanvas_set_target.restype = Result
         result = self.thorvg_lib.tvg_swcanvas_set_target(

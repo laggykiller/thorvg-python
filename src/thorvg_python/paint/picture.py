@@ -94,7 +94,7 @@ class Picture(Paint):
             ctypes.POINTER(data_arr_type),
             ctypes.c_uint32,
             ctypes.c_uint32,
-            ctypes.c_int,
+            ctypes.c_uint8,
             ctypes.c_bool,
         ]
         self.thorvg_lib.tvg_picture_load_raw.restype = Result

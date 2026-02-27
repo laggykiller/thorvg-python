@@ -508,7 +508,7 @@ class Paint:
         self.thorvg_lib.tvg_paint_set_mask_method.argtypes = [
             PaintPointer,
             PaintPointer,
-            ctypes.c_int,
+            ctypes.c_uint8,
         ]
         self.thorvg_lib.tvg_paint_set_mask_method.restype = Result
         return self.thorvg_lib.tvg_paint_set_mask_method(
@@ -523,11 +523,11 @@ class Paint:
         :return: The method used to mask the source object with the target.
         :rtype: thorvg_python.base.MaskMethod
         """
-        method = ctypes.c_int()
+        method = ctypes.c_uint8()
         self.thorvg_lib.tvg_paint_get_mask_method.argtypes = [
             PaintPointer,
             PaintPointer,
-            ctypes.POINTER(ctypes.c_int),
+            ctypes.POINTER(ctypes.c_uint8),
         ]
         self.thorvg_lib.tvg_paint_get_mask_method.restype = Result
         result = self.thorvg_lib.tvg_paint_get_mask_method(
@@ -614,10 +614,10 @@ class Paint:
         :return: The unique type of the paint instance type.
         :rtype: thorvg_python.base.TvgType
         """
-        _type = ctypes.c_int()
+        _type = ctypes.c_uint8()
         self.thorvg_lib.tvg_paint_get_type.argtypes = [
             PaintPointer,
-            ctypes.POINTER(ctypes.c_int),
+            ctypes.POINTER(ctypes.c_uint8),
         ]
         self.thorvg_lib.tvg_paint_get_type.restype = Result
         result = self.thorvg_lib.tvg_paint_get_type(
@@ -642,7 +642,7 @@ class Paint:
         """
         self.thorvg_lib.tvg_paint_set_blend_method.argtypes = [
             PaintPointer,
-            ctypes.c_int,
+            ctypes.c_uint8,
         ]
         self.thorvg_lib.tvg_paint_set_blend_method.restype = Result
         return self.thorvg_lib.tvg_paint_set_blend_method(

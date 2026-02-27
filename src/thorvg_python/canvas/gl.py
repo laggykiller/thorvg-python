@@ -50,7 +50,7 @@ class GlCanvas(Canvas):
 
         .. versionadded:: 1.0
         """
-        self.thorvg_lib.tvg_glcanvas_create.argtypes = [ctypes.c_int]
+        self.thorvg_lib.tvg_glcanvas_create.argtypes = [ctypes.c_uint8]
         self.thorvg_lib.tvg_glcanvas_create.restype = CanvasPointer
         return self.thorvg_lib.tvg_glcanvas_create(op)
 
@@ -99,7 +99,7 @@ class GlCanvas(Canvas):
             ctypes.c_uint32,
             ctypes.c_uint32,
             ctypes.c_uint32,
-            ctypes.c_int,
+            ctypes.c_uint8,
         ]
         self.thorvg_lib.tvg_glcanvas_set_target.restype = Result
         result = self.thorvg_lib.tvg_glcanvas_set_target(

@@ -214,7 +214,7 @@ class Text(Paint):
         """
         self.thorvg_lib.tvg_text_wrap_mode.argtypes = [
             PaintPointer,
-            TextWrap,
+            ctypes.c_uint8,
         ]
         self.thorvg_lib.tvg_text_wrap_mode.restype = Result
         return self.thorvg_lib.tvg_text_wrap_mode(

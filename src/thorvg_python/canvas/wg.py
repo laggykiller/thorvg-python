@@ -47,7 +47,7 @@ class WgCanvas(Canvas):
 
         .. versionadded:: 1.0
         """
-        self.thorvg_lib.tvg_wgcanvas_create.argtypes = [ctypes.c_int]
+        self.thorvg_lib.tvg_wgcanvas_create.argtypes = [ctypes.c_uint8]
         self.thorvg_lib.tvg_wgcanvas_create.restype = CanvasPointer
         return self.thorvg_lib.tvg_wgcanvas_create(op)
 
@@ -66,10 +66,10 @@ class WgCanvas(Canvas):
         :param Any device: WGPUDevice, a desired handle for the wgpu device. If it is ``None``, ThorVG will assign an appropriate device internally.
         :param Any instance: WGPUInstance, context for all other wgpu objects.
         :param Any target: Either WGPUSurface or WGPUTexture, serving as handles to a presentable surface or texture.
+        :param int _type: ``0``: surface,  ``1``: texture are used as pesentable target.
         :param int w: The width of the target.
         :param int h: The height of the target.
         :param int cs: Specifies how the pixel values should be interpreted. Currently, it only allows ``Colorspace.ABGR8888S`` as ``WGPUTextureFormat_RGBA8Unorm``.
-        :param int _type: ``0``: surface,  ``1``: texture are used as pesentable target.
 
             TVG_RESULT_INSUFFICIENT_CONDITION if the canvas is performing rendering. Please ensure the canvas is synced.
             TVG_RESULT_NOT_SUPPORTED In case the wg engine is not supported.
@@ -83,7 +83,7 @@ class WgCanvas(Canvas):
             ctypes.c_void_p,
             ctypes.c_uint32,
             ctypes.c_uint32,
-            ctypes.c_int,
+            ctypes.c_uint8,
             ctypes.c_int,
         ]
         self.thorvg_lib.tvg_wgcanvas_set_target.restype = Result
@@ -95,6 +95,6 @@ class WgCanvas(Canvas):
             ctypes.c_uint32(w),
             ctypes.c_uint32(h),
             cs,
-            ctypes.c_uint(_type),
+            ctypes.c_int(_type),
         )
         return result

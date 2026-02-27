@@ -92,7 +92,7 @@ class Gradient:
         """
         self.thorvg_lib.tvg_gradient_set_spread.argtypes = [
             GradientPointer,
-            ctypes.c_int,
+            ctypes.c_uint8,
         ]
         self.thorvg_lib.tvg_gradient_set_spread.restype = Result
         return self.thorvg_lib.tvg_gradient_set_spread(
@@ -108,10 +108,10 @@ class Gradient:
         :return: The FillSpread value.
         :rtype: StrokeFill
         """
-        spread = ctypes.c_int()
+        spread = ctypes.c_uint8()
         self.thorvg_lib.tvg_gradient_get_spread.argtypes = [
             GradientPointer,
-            ctypes.POINTER(ctypes.c_int),
+            ctypes.POINTER(ctypes.c_uint8),
         ]
         self.thorvg_lib.tvg_gradient_get_spread.restype = Result
         result = self.thorvg_lib.tvg_gradient_get_spread(
@@ -173,10 +173,10 @@ class Gradient:
         .. note::
             Experimental API
         """
-        _type = ctypes.c_int()
+        _type = ctypes.c_uint8()
         self.thorvg_lib.tvg_gradient_get_type.argtypes = [
             GradientPointer,
-            ctypes.POINTER(ctypes.c_int),
+            ctypes.POINTER(ctypes.c_uint8),
         ]
         self.thorvg_lib.tvg_gradient_get_type.restype = Result
         result = self.thorvg_lib.tvg_gradient_get_type(

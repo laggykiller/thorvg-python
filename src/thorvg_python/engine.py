@@ -134,9 +134,9 @@ class Engine:
             and cannot be changed in subsequent calls.
         .. seealso:: Engine.term()
         """
-        self.thorvg_lib.tvg_engine_init.argtypes = [ctypes.c_int]
+        self.thorvg_lib.tvg_engine_init.argtypes = [ctypes.c_uint32]
         self.thorvg_lib.tvg_engine_init.restype = Result
-        return self.thorvg_lib.tvg_engine_init(ctypes.c_int(threads))
+        return self.thorvg_lib.tvg_engine_init(ctypes.c_uint32(threads))
 
     def term(self) -> Result:
         """Terminates TVG engines.
