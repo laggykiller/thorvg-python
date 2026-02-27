@@ -10,11 +10,7 @@ import thorvg_python as tvg
 
 PILLOW_LOADED = True if find_spec("PIL") else False
 file_dir = os.path.split(__file__)[0]
-
-if platform.system() == "Windows":
-    ref_dir = os.path.join(file_dir, "ref_win")
-else:
-    ref_dir = os.path.join(file_dir, "ref")
+ref_dir = os.path.join(file_dir, "ref")
 
 if TYPE_CHECKING:
     from PIL import Image
