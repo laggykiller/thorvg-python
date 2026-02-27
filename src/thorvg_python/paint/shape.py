@@ -685,7 +685,7 @@ class Shape(Paint):
         """
         self.thorvg_lib.tvg_shape_set_stroke_join.argtypes = [
             PaintPointer,
-            ctypes.c_uint8,
+            ctypes.c_uint32,
         ]
         self.thorvg_lib.tvg_shape_set_stroke_join.restype = Result
         return self.thorvg_lib.tvg_shape_set_stroke_join(
@@ -701,10 +701,10 @@ class Shape(Paint):
         :return: The join style value.
         :rtype: thorvg_python.base.StrokeJoin
         """
-        join = ctypes.c_uint8()
+        join = ctypes.c_uint32()
         self.thorvg_lib.tvg_shape_get_stroke_join.argtypes = [
             PaintPointer,
-            ctypes.POINTER(ctypes.c_uint8),
+            ctypes.POINTER(ctypes.c_uint32),
         ]
         self.thorvg_lib.tvg_shape_get_stroke_join.restype = Result
         result = self.thorvg_lib.tvg_shape_get_stroke_join(
