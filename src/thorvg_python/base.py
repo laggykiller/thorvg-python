@@ -414,26 +414,30 @@ class ColorStop(ctypes.Structure):
     # a: int  #: The alpha channel value in the range [0 ~ 255], where 0 is completely transparent and 255 is opaque.
 
 
-class TextWrap(ctypes.Structure):
+class TextWrap(IntEnum):
     """A data structure storing the information about the color and its relative position inside the gradient bounds."""
 
     #: Do not wrap text. Text is rendered on a single line and may overflow the bounding area.
-    TVG_TEXT_WRAP_NONE = 0
+    NONE = 0
 
     #: Wrap at the character level. If a word cannot fit, it is broken into individual characters to fit the line.
-    TVG_TEXT_WRAP_CHARACTER = 1
+    CHARACTER = 1
 
     #: Wrap at the word level. Words that do not fit are moved to the next line.
-    TVG_TEXT_WRAP_WORD = 2
+    WORD = 2
 
     #: Smart choose wrapping method: word wrap first, falling back to character wrap if a word does not fit.
-    TVG_TEXT_WRAP_SMART = 3
+    SMART = 3
 
     #: Truncate overflowing text and append an ellipsis ("...") at the end. Typically used for single-line labels.
-    TVG_TEXT_WRAP_ELLIPSIS = 4
+    ELLIPSIS = 4
 
     #: Reserved. No Support.
-    TVG_TEXT_WRAP_HYPHENATION = 5
+    HYPHENATION = 5
+
+    @classmethod
+    def from_param(cls, obj: int) -> int:
+        return int(obj)
 
 
 class PointStruct(ctypes.Structure):
