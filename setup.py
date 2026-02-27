@@ -7,6 +7,7 @@ import sys
 from typing import Any, Dict, List
 
 from setuptools import find_packages, setup  # type: ignore
+from setuptools.command.build_py import build_py  # type: ignore
 
 CONAN_ARCHS = {
     "x86_64": ["amd64", "x86_64", "x64"],
@@ -175,33 +176,38 @@ def fetch_thorvg(conan_info: Dict[Any, Any]) -> List[str]:
     return lib_paths
 
 
-def compile():
-    arch = get_arch()
-    print(f"Detected system architecture as {arch}")
+class build_py_custom(build_py):
+    def run(self, *args: Any, **kwargs: Any):
+        arch = get_arch()
+        print(f"Detected system architecture as {arch}")
 
-    if arch == "universal2":
-        conan_info = install_thorvg("x86_64")
-        lib_paths = fetch_thorvg(conan_info)
-        conan_info = install_thorvg("armv8")
-        lib_paths.extend(fetch_thorvg(conan_info))
-        print(f"{lib_paths=}")
-        subprocess.run(
-            [
-                "lipo",
-                "-create",
-                lib_paths[0],
-                lib_paths[1],
-                "-output",
-                "src/thorvg_python/libthorvg-1.dylib",
-            ]
-        )
-    else:
-        conan_info = install_thorvg(arch)
-        lib_paths = fetch_thorvg(conan_info)
-        print(f"{lib_paths=}")
-        for lib_path in lib_paths:
-            shutil.copy(lib_path, "src/thorvg_python/")
+        if arch == "universal2":
+            conan_info = install_thorvg("x86_64")
+            lib_paths = fetch_thorvg(conan_info)
+            conan_info = install_thorvg("armv8")
+            lib_paths.extend(fetch_thorvg(conan_info))
+            print(f"{lib_paths=}")
+            subprocess.run(
+                [
+                    "lipo",
+                    "-create",
+                    lib_paths[0],
+                    lib_paths[1],
+                    "-output",
+                    "src/thorvg_python/libthorvg-1.dylib",
+                ]
+            )
+        else:
+            conan_info = install_thorvg(arch)
+            lib_paths = fetch_thorvg(conan_info)
+            print(f"{lib_paths=}")
+            for lib_path in lib_paths:
+                shutil.copy(lib_path, "src/thorvg_python/")
 
+        super().run(*args, **kwargs)
+
+
+if __name__ == "__main__":
     setup(
         zip_safe=False,
         packages=find_packages(where="src"),
@@ -210,8 +216,7 @@ def compile():
         package_data={
             "thorvg_python": ["*.dll", "*.dylib", "*.so"],
         },
+        cmdclass={
+            "build_py": build_py_custom,
+        },
     )
-
-
-if __name__ == "__main__":
-    compile()
