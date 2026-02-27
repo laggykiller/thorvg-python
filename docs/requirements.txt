@@ -2,3 +2,4 @@ Sphinx~=8.2.0
 Pillow
 myst-parser
 sphinx_immaterial
+sphinx-autoapi

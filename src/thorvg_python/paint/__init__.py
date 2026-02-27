@@ -33,8 +33,6 @@ class Paint:
 
         This is the counterpart to the ``new()`` API, and releases the given Paint object safely,
         handling ``None`` and managing ownership properly.
-
-        :param PaintPointer paint: A PaintPointer object to release.
         """
         self.thorvg_lib.tvg_paint_rel.argtypes = [
             PaintPointer,
@@ -177,7 +175,7 @@ class Paint:
         :return:
             - Result.INVALID_ARGUMENT An invalid PaintPointer.
             - Result.INSUFFICIENT_CONDITION in case a custom transform is applied.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. seealso:: Paint.set_transform()
         """
@@ -205,7 +203,7 @@ class Paint:
         :return:
             - Result.INVALID_ARGUMENT An invalid PaintPointer.
             - Result.INSUFFICIENT_CONDITION in case a custom transform is applied.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. seealso:: Paint.set_transform()
         """
@@ -235,7 +233,7 @@ class Paint:
         :return:
             - Result.INVALID_ARGUMENT An invalid PaintPointer.
             - Result.INSUFFICIENT_CONDITION in case a custom transform is applied.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. seealso:: Paint.set_transform()
         """
@@ -259,10 +257,10 @@ class Paint:
 
         The augmented matrix of the transformation is expected to be given.
 
-        :param Matrix m: The 3x3 augmented matrix.
+        :param thorvg_python.base.Matrix m: The 3x3 augmented matrix.
 
         :return: Result.INVALID_ARGUMENT A ``None`` is passed as the argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         """
         self.thorvg_lib.tvg_paint_set_transform.argtypes = [
             PaintPointer,
@@ -282,9 +280,9 @@ class Paint:
         In case no transformation was applied, the identity matrix is returned.
 
         :return: Result.INVALID_ARGUMENT A ``None`` is passed as the argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The 3x3 augmented matrix.
-        :rtype: Matrix
+        :rtype: thorvg_python.base.Matrix
         """
         m = Matrix()
         self.thorvg_lib.tvg_paint_get_transform.argtypes = [
@@ -307,7 +305,7 @@ class Paint:
         :param int opacity: The opacity value in the range [0 ~ 255], where 0 is completely transparent and 255 is opaque.
 
         :return: Result.INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             Setting the opacity with this API may require multiple renderings using a composition.
@@ -329,7 +327,7 @@ class Paint:
         """Gets the opacity of the given PaintPointer.
 
         :return: Result.INVALID_ARGUMENT In case a ``None`` is passed as the argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The opacity value in the range [0 ~ 255], where 0 is completely transparent and 255 is opaque.
         :rtype: int
         """
@@ -353,7 +351,7 @@ class Paint:
         Creates a new object and sets its all properties as in the original object.
 
         :return: A copied PaintPointer object if succeed, ``None`` otherwise.
-        :rtype: Optional[PaintPointer]
+        :rtype: Optional[thorvg_python.base.PaintPointer]
         """
         self.thorvg_lib.tvg_paint_duplicate.argtypes = [
             PaintPointer,
@@ -426,7 +424,7 @@ class Paint:
         :return:
             - Result.INVALID_ARGUMENT An invalid ``paint``.
             - Result.INSUFFICIENT_CONDITION If it failed to compute the bounding box (mostly due to invalid path information).
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The x-coordinate of the upper-left corner of the bounding box.
         :rtype: float
         :return: The y-coordinate of the upper-left corner of the bounding box.
@@ -473,9 +471,9 @@ class Paint:
         :return:
             - Result.INVALID_ARGUMENT ``paint`` or ``pt4`` is invalid.
             - Result.INSUFFICIENT_CONDITION If it failed to compute the bounding box (mostly due to invalid path information).
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: An array of four points representing the bounding box. The array size must be 4.
-        :rtype: PointStruct
+        :rtype: thorvg_python.base.PointStruct
 
         .. seealso:: Paint.get_aabb()
         .. seealso:: Canvas.update()
@@ -501,11 +499,11 @@ class Paint:
     ) -> Result:
         """Sets the masking target object and the masking method.
 
-        :param Paint target: The target object of the masking.
-        :param MaskMethod method: The method used to mask the source object with the target.
+        :param thorvg_python.paint.Paint target: The target object of the masking.
+        :param thorvg_python.base.MaskMethod method: The method used to mask the source object with the target.
 
         :return: Result.INSUFFICIENT_CONDITION if the target has already belonged to another paint.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         """
         self.thorvg_lib.tvg_paint_set_mask_method.argtypes = [
             PaintPointer,
@@ -521,9 +519,9 @@ class Paint:
         """Gets the masking target object and the masking method.
 
         :return: Result.INVALID_ARGUMENT A ``None`` is passed as the argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The method used to mask the source object with the target.
-        :rtype: MaskMethod
+        :rtype: thorvg_python.base.MaskMethod
         """
         method = ctypes.c_int()
         self.thorvg_lib.tvg_paint_get_mask_method.argtypes = [
@@ -544,12 +542,12 @@ class Paint:
 
         This function restricts the drawing area of the paint object to the specified shape's paths.
 
-        :param Paint clipper: The shape object as the clipper.
+        :param thorvg_python.paint.Paint clipper: The shape object as the clipper.
 
         :return:
             - Result.INVALID_ARGUMENT In case a ``None`` is passed as the argument.
             - Result.NOT_SUPPORTED If the ``clipper`` type is not Shape.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         """
         self.thorvg_lib.tvg_paint_set_clip.argtypes = [
             PaintPointer,
@@ -612,9 +610,9 @@ class Paint:
         Gets the unique value of the paint instance indicating the instance type.
 
         :return: Result.INVALID_ARGUMENT In case a ``None`` is passed as the argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The unique type of the paint instance type.
-        :rtype: TvgType
+        :rtype: thorvg_python.base.TvgType
         """
         _type = ctypes.c_int()
         self.thorvg_lib.tvg_paint_get_type.argtypes = [
@@ -635,10 +633,10 @@ class Paint:
         its process involves the combination of colors or images from the source paint object with the destination (the lower layer image) using blending operations.
         The blending operation is determined by the chosen ``BlendMethod``, which specifies how the colors or images are combined.
 
-        :param BlendMethod method: The blending method to be set.
+        :param thorvg_python.base.BlendMethod method: The blending method to be set.
 
         :return: Result.INVALID_ARGUMENT In case a ``None`` is passed as the argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. versionadded:: 0.15
         """

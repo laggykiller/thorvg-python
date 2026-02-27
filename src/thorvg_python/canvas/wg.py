@@ -35,10 +35,10 @@ class WgCanvas(Canvas):
         This method generates a WebGPU canvas instance that can be used for drawing vector graphics.
         It accepts an optional parameter ``op`` to choose between different rendering engine behaviors.
 
-        :param EngineOption op: The rendering engine option.
+        :param thorvg_python.engine.EngineOption op: The rendering engine option.
 
         :return: A new CanvasPointer object.
-        :rtype: CanvasPointer
+        :rtype: thorvg_python.base.CanvasPointer
 
         .. note::
             Currently, it does not support ``EngineOption.SMART_RENDER``. The request will be ignored.

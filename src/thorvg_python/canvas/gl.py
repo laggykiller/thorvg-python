@@ -35,10 +35,10 @@ class GlCanvas(Canvas):
         This method generates a OpenGL/ES canvas instance that can be used for drawing vector graphics.
         It accepts an optional parameter ``op`` to choose between different rendering engine behaviors.
 
-        :param EngineOption op: The rendering engine option.
+        :param thorvg_python.engine.EngineOption op: The rendering engine option.
 
         :return: A new CanvasPointer object.
-        :rtype: CanvasPointer
+        :rtype: thorvg_python.base.CanvasPointer
 
         .. note::
             Currently, it does not support ``EngineOption.SMART_RENDER``. The request will be ignored.
@@ -72,20 +72,20 @@ class GlCanvas(Canvas):
         :param Any display: The platform-specific display handle (EGLDisplay for EGL). Set ``None`` for other systems.
         :param Any surface: The platform-specific surface handle (EGLSurface for EGL, HDC for WGL). Set ``None`` for other systems.
         :param Any context: The OpenGL context to be used for rendering on this canvas.
-        :param int id: The GL target ID, usually indicating the FBO ID. A value of ``0`` specifies the main surface.
+        :param int _id: The GL target ID, usually indicating the FBO ID. A value of ``0`` specifies the main surface.
         :param int w: The width (in pixels) of the raster image.
         :param int h: The height (in pixels) of the raster image.
         :param ColorSpace cs: Specifies how the pixel values should be interpreted. Currently, it only allows ``Colorspace.ABGR8888S`` as ``GL_RGBA8``.
 
         :return:
             - Result.INSUFFICIENT_CONDITION If the canvas is currently rendering.
-            Ensure that ``Canvas.sync()`` has been called before setting a new target.
+              Ensure that ``Canvas.sync()`` has been called before setting a new target.
             - Result.NOT_SUPPORTED In case the gl engine is not supported.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             If ``display`` and ``surface`` are not provided, the ThorVG GL engine assumes that
-        the appropriate OpenGL context is already current and will not attempt to bind a new one.
+            the appropriate OpenGL context is already current and will not attempt to bind a new one.
 
         .. seealso:: Canvas.sync()
 

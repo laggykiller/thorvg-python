@@ -48,7 +48,7 @@ class Shape(Paint):
         Note that you need not call this method as it is auto called when initializing ``Shape()``.
 
         :return: A new shape object.
-        :rtype: PaintPointer
+        :rtype: thorvg_python.base.PaintPointer
         """
         self.thorvg_lib.tvg_shape_new.restype = PaintPointer
         return self.thorvg_lib.tvg_shape_new()
@@ -59,7 +59,7 @@ class Shape(Paint):
         The color, the fill and the stroke properties are retained.
 
         :return: Result.INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             The memory, where the path data is stored, is not deallocated at this stage for caching effect.
@@ -77,7 +77,7 @@ class Shape(Paint):
         :param float y: The vertical coordinate of the initial point of the sub-path.
 
         :return: Result.INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         """
         self.thorvg_lib.tvg_shape_move_to.argtypes = [
             PaintPointer,
@@ -101,7 +101,7 @@ class Shape(Paint):
         :param float y: The vertical coordinate of the end-point of the line.
 
         :return: Result.INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             In case this is the first command in the path, it corresponds to the Shape.move_to() call.
@@ -141,7 +141,7 @@ class Shape(Paint):
         :param float y: The vertical coordinate of the endpoint of the curve.
 
         :return: Result.INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             In case this is the first command in the path, no data from the path are rendered.
@@ -174,7 +174,7 @@ class Shape(Paint):
         The value of the current point is set to the initial point of the closed sub-path.
 
         :return: Result.INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             In case the sub-path does not contain any points, this function has no effect.
@@ -218,7 +218,7 @@ class Shape(Paint):
         :param bool cw: Specifies the path direction: ``true`` for clockwise, ``false`` for counterclockwise.
 
         :return: Result.INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             For ``rx`` and ``ry`` greater than or equal to the half of ``w`` and the half of ``h``,
@@ -269,7 +269,7 @@ class Shape(Paint):
         :param bool cw: Specifies the path direction: ``true`` for clockwise, ``false`` for counterclockwise.
 
         :return: Result.INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         """
         self.thorvg_lib.tvg_shape_append_circle.argtypes = [
             PaintPointer,
@@ -300,11 +300,11 @@ class Shape(Paint):
         For each command from the ``cmds`` array, an appropriate number of points in ``pts`` array should be specified.
         If the number of points in the ``pts`` array is different than the number required by the ``cmds`` array, the shape with this sub-path will not be displayed on the screen.
 
-        :param Sequence[PathCommand] cmds: The array of the commands in the sub-path.
-        :param Sequence[PointStruct] pts: The array of the two-dimensional points.
+        :param Sequence[thorvg_python.base.PathCommand] cmds: The array of the commands in the sub-path.
+        :param Sequence[thorvg_python.base.PointStruct] pts: The array of the two-dimensional points.
 
         :return: Result.INVALID_ARGUMENT A ``None`` passed as the argument or ``cmdCnt`` or ``ptsCnt`` equal to zero.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         """
         cmds_arr_type = ctypes.c_int * len(cmds)
         pts_arr_type = PointStruct * len(pts)
@@ -332,11 +332,11 @@ class Shape(Paint):
         The function does not allocate any data, it operates on internal memory. There is no need to free the ``pts`` sequence.
 
         :return: Result.INVALID_ARGUMENT A ``None`` passed as the argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: A sequence of the commands from the path.
-        :rtype: Sequence[PathCommand]
+        :rtype: Sequence[thorvg_python.base.PathCommand]
         :return: A sequence of the two-dimensional points from the path.
-        :rtype: Sequence[PointStruct]
+        :rtype: Sequence[thorvg_python.base.PointStruct]
         """
         cmds_ptr = ctypes.POINTER(ctypes.c_uint8)()
         cmds_cnt = ctypes.c_uint32()
@@ -382,7 +382,7 @@ class Shape(Paint):
         :param width: The width of the stroke in pixels. Must be positive value. (The default is 0)
 
         :return: TVG_RESULT_INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             A value of ``width`` 0 disables the stroke.
@@ -403,7 +403,7 @@ class Shape(Paint):
         """Gets the shape's stroke width.
 
         :return: Result.INVALID_ARGUMENT An invalid pointer passed as an argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The stroke width.
         :rtype: float
         """
@@ -434,7 +434,7 @@ class Shape(Paint):
         :param int a: The alpha channel value in the range [0 ~ 255], where 0 is completely transparent and 255 is opaque.
 
         :return: Result.INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             If the stroke width is 0 (default), the stroke will not be visible regardless of the color.
@@ -466,7 +466,7 @@ class Shape(Paint):
         :return:
             - Result.INVALID_ARGUMENT An invalid PaintPointer.
             - Result.INSUFFICIENT_CONDITION No stroke was set.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The red color channel value in the range [0 ~ 255]. The default value is 0.
         :rtype: int
         :return: The green color channel value in the range [0 ~ 255]. The default value is 0.
@@ -501,12 +501,12 @@ class Shape(Paint):
     def set_stroke_gradient(self, grad: "Gradient") -> Result:
         """Sets the gradient fill of the stroke for all of the figures from the path.
 
-        :param Gradient grad: The gradient fill.
+        :param thorvg_python.gradient.Gradient grad: The gradient fill.
 
         :return:
             - Result.INVALID_ARGUMENT An invalid PaintPointer.
             - Result.MEMORY_CORRUPTION An invalid GradientPointer or an error with accessing it.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             Either a solid color or a gradient fill is applied, depending on what was set as last.
@@ -529,9 +529,9 @@ class Shape(Paint):
         The function does not allocate any memory.
 
         :return: Result.INVALID_ARGUMENT An invalid pointer passed as an argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The gradient fill.
-        :rtype: Optional[Gradient]
+        :rtype: Optional[thorvg_python.Gradient]
         """
         grad = GradientPointer()
         self.thorvg_lib.tvg_shape_get_stroke_gradient.argtypes = [
@@ -562,7 +562,7 @@ class Shape(Paint):
         :param float offset: The shift of the starting point within the repeating dash pattern, from which the pattern begins to be applied.
 
         :return: Result.INVALID_ARGUMENT In case ``dash_pattern`` is ``None`` and ``cnt`` > 0 or ``dash_pattern`` is not ``None`` and ``cnt`` is zero.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             To reset the stroke dash pattern, pass ``None`` to ``dash_pattern`` and zero to ``cnt``.
@@ -572,7 +572,7 @@ class Shape(Paint):
             If all values in the ``dash_pattern`` are equal to or less than 0, the dash is ignored.
         .. note::
             If the ``dash_pattern`` contains an odd number of elements, the sequence is repeated in the same
-        order to form an even-length pattern, preserving the alternation of dashes and gaps.
+            order to form an even-length pattern, preserving the alternation of dashes and gaps.
         .. versionadded:: 1.0
         """
         if dash_pattern is not None:
@@ -602,7 +602,7 @@ class Shape(Paint):
         The function does not allocate any memory.
 
         :return: Result.INVALID_ARGUMENT An invalid pointer passed as an argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The array of consecutive pair values of the dash length and the gap length.
         :rtype: Sequence[float]
         :return: The shift of the starting point within the repeating dash pattern.
@@ -640,10 +640,10 @@ class Shape(Paint):
 
         The cap style specifies the shape to be used at the end of the open stroked sub-paths.
 
-        :param StrokeCap cap: The cap style value. The default value is ``StrokeCap.SQUARE``.
+        :param thorvg_python.base.StrokeCap cap: The cap style value. The default value is ``StrokeCap.SQUARE``.
 
         :return: Result.INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         """
         self.thorvg_lib.tvg_shape_set_stroke_cap.argtypes = [
             PaintPointer,
@@ -659,9 +659,9 @@ class Shape(Paint):
         """Gets the stroke cap style used for stroking the path.
 
         :return: Result.INVALID_ARGUMENT An invalid pointer passed as an argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The cap style value.
-        :rtype: StrokeCap
+        :rtype: thorvg_python.base.StrokeCap
         """
         cap = ctypes.c_int()
         self.thorvg_lib.tvg_shape_get_stroke_cap.argtypes = [
@@ -678,10 +678,10 @@ class Shape(Paint):
     def set_stroke_join(self, join: StrokeJoin) -> Result:
         """Sets the join style for stroked path segments.
 
-        :param StrokeJoin join: The join style value. The default value is ``StrokeJoin.BEVEL``.
+        :param thorvg_python.base.StrokeJoin join: The join style value. The default value is ``StrokeJoin.BEVEL``.
 
         :return: Result.INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         """
         self.thorvg_lib.tvg_shape_set_stroke_join.argtypes = [
             PaintPointer,
@@ -697,9 +697,9 @@ class Shape(Paint):
         """The function gets the stroke join method
 
         :return: Result.INVALID_ARGUMENT An invalid pointer passed as an argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The join style value.
-        :rtype: StrokeJoin
+        :rtype: thorvg_python.base.StrokeJoin
         """
         join = ctypes.c_int()
         self.thorvg_lib.tvg_shape_get_stroke_join.argtypes = [
@@ -720,7 +720,7 @@ class Shape(Paint):
 
         :return: Result enumeration
             INVALID_ARGUMENT An invalid PaintPointer or Unsupported ``miterlimit`` values (less than zero).
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. versionadded:: 0.11
         """
@@ -738,7 +738,7 @@ class Shape(Paint):
         """The function gets the stroke miterlimit.
 
         :return: Result.INVALID_ARGUMENT An invalid pointer passed as an argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The stroke miterlimit.
         :rtype: float
 
@@ -769,10 +769,10 @@ class Shape(Paint):
         :param float begin: Specifies the start of the segment to display along the path.
         :param float end: Specifies the end of the segment to display along the path.
         :param bool simultaneous: Determines how to trim multiple paths within a single shape. If set to ``true`` (default), trimming is applied simultaneously to all paths;
-        Otherwise, all paths are treated as a single entity with a combined length equal to the sum of their individual lengths and are trimmed as such.
+            Otherwise, all paths are treated as a single entity with a combined length equal to the sum of their individual lengths and are trimmed as such.
 
         :return: TVG_RESULT_INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. versionadded:: 1.0
         """
@@ -807,7 +807,7 @@ class Shape(Paint):
         :param int a The alpha channel value in the range [0 ~ 255], where 0 is completely transparent and 255 is opaque. The default value is 0.
 
         :return: Result.INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             Either a solid color or a gradient fill is applied, depending on what was set as last.
@@ -841,7 +841,7 @@ class Shape(Paint):
         :return: The alpha channel value in the range [0 ~ 255], where 0 is completely transparent and 255 is opaque. The default value is 0.
         :rtype: int
         :return: Result.INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         """
         r = ctypes.c_uint8()
         g = ctypes.c_uint8()
@@ -871,10 +871,10 @@ class Shape(Paint):
         Specifies how the interior of the shape is determined when its path intersects itself.
         The default fill rule is ``FillRule.NON_ZERO``.
 
-        :param FillRule rule: The fill rule to apply to the shape.
+        :param thorvg_python.base.FillRule rule: The fill rule to apply to the shape.
 
         :return: TVG_RESULT_INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         """
         self.thorvg_lib.tvg_shape_set_fill_rule.argtypes = [
             PaintPointer,
@@ -893,9 +893,9 @@ class Shape(Paint):
         regions of the shape are calculated when it overlaps itself.
 
         :return: The current FillRule value of the shape.
-        :rtype: FillRule
+        :rtype: thorvg_python.base.FillRule
         :return: TVG_RESULT_INVALID_ARGUMENT An invalid pointer passed as an argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         """
         rule = ctypes.c_int()
         self.thorvg_lib.tvg_shape_get_fill_rule.argtypes = [
@@ -913,10 +913,10 @@ class Shape(Paint):
     def set_paint_order(self, stroke_first: bool) -> Result:
         """Sets the rendering order of the stroke and the fill.
 
-        :param bool strokeFirst: If ``true`` the stroke is rendered before the fill, otherwise the stroke is rendered as the second one (the default option).
+        :param bool stroke_first: If ``true`` the stroke is rendered before the fill, otherwise the stroke is rendered as the second one (the default option).
 
         :return: Result.INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. versionadded:: 0.10
         """
@@ -935,12 +935,12 @@ class Shape(Paint):
 
         The parts of the shape defined as inner are filled.
 
-        :param Gradient grad: The gradient fill.
+        :param thorvg_python.gradient.Gradient grad: The gradient fill.
 
         :return:
             - TVG_RESULT_INVALID_ARGUMENT An invalid PaintPointer.
             - TVG_RESULT_MEMORY_CORRUPTION An invalid GradientPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             Either a solid color or a gradient fill is applied, depending on what was set as last.
@@ -962,9 +962,9 @@ class Shape(Paint):
         The function does not allocate any data.
 
         :return: Result.INVALID_ARGUMENT An invalid pointer passed as an argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The gradient fill.
-        :rtype: GradientPointer
+        :rtype: thorvg_python.base.GradientPointer
         """
         grad = GradientPointer()
         self.thorvg_lib.tvg_shape_get_gradient.argtypes = [

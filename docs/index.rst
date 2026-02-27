@@ -15,4 +15,3 @@ thorvg-python is a ctypes API for thorvg, with additional functions for getting 
    installing
    examples
    credits
-   modules

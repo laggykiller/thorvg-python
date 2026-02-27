@@ -28,7 +28,7 @@ class LottieAnimation(Animation):
         """Creates a new LottieAnimation object.
 
         :return: AnimationPointer A new Lottie AnimationPointer object.
-        :rtype: AnimationPointer
+        :rtype: thorvg_python.base.AnimationPointer
 
         .. versionadded:: 0.15
         """
@@ -73,7 +73,7 @@ class LottieAnimation(Animation):
             - Result.INSUFFICIENT_CONDITION In case the animation is not loaded.
             - Result.INVALID_ARGUMENT When the given ``_id`` is invalid
             - Result.NOT_SUPPORTED The Lottie Animation is not supported.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. versionadded:: 1.0
         """
@@ -93,13 +93,12 @@ class LottieAnimation(Animation):
     ) -> Result:
         """Deletes a previously generated slot.
 
-        :param animation: The AnimationPointer to the Lottie animation object.
-        :param id: The ID of the slot to delete.
+        :param _id: The ID of the slot to delete.
 
         :return:
             - Result.INSUFFICIENT_CONDITION In case the animation is not loaded or the slot ID is invalid.
             - Result.NOT_SUPPORTED The Lottie Animation is not supported.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             This function should be paired with gen.
@@ -128,7 +127,7 @@ class LottieAnimation(Animation):
             - Result.INSUFFICIENT_CONDITION In case the animation is not loaded.
             - Result.INVALID_ARGUMENT When the given ``marker`` is invalid.
             - Result.NOT_SUPPORTED The Lottie Animation is not supported.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             Experimental API
@@ -152,7 +151,7 @@ class LottieAnimation(Animation):
         """Gets the marker count of the animation.
 
         :return: Result.INVALID_ARGUMENT In case a ``None`` is passed as the argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The count value of the markers.
         :rtype: int
 
@@ -216,7 +215,7 @@ class LottieAnimation(Animation):
         :param progress: The current progress of the interpolation (range: 0.0 to 1.0).
 
         :return: TVG_RESULT_INSUFFICIENT_CONDITION In case the animation is not loaded.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. versionadded:: 1.0
         """
@@ -246,7 +245,7 @@ class LottieAnimation(Animation):
             - Result.INSUFFICIENT_CONDITION If the animation is not loaded.
             - Result.INVALID_ARGUMENT When the given parameter is invalid.
             - Result.NOT_SUPPORTED When neither the layer nor the property is found in the current animation.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             Experimental API
@@ -287,7 +286,7 @@ class LottieAnimation(Animation):
         :return:
             - Result.INSUFFICIENT_CONDITION If the animation is not loaded.
             - Result.INVALID_ARGUMENT An invalid AnimationPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             This option is used as a hint; its behavior heavily depends on the render backend.

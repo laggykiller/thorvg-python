@@ -126,7 +126,7 @@ class Engine:
 
         :param int threads: The number of additional threads used to perform rendering. Zero indicates only the main thread is to be used.
 
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             The initializer uses internal reference counting to track multiple calls.
@@ -144,7 +144,7 @@ class Engine:
         Cleans up resources and stops any internal threads initialized by Engine.init().
 
         :return: Result.INSUFFICIENT_CONDITION Returned if there is nothing to terminate (e.g., Engine.init() was not called).
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. seealso:: Engine.init()
         """
@@ -157,7 +157,7 @@ class Engine:
         Retrieves the version of the TVG engine.
 
         :return: Result.SUCCESS
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: A major version number.
         :rtype: int
         :return: A minor version number.

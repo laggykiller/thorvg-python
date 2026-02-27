@@ -32,7 +32,7 @@ class Scene(Paint):
         To properly destroy the Scene object, use ``Paint.rel()``.
 
         :return: A pointer to the newly created Scene object.
-        :rtype: PaintPointer
+        :rtype: thorvg_python.base.PaintPointer
 
         .. seealso:: Paint.rel()
         """
@@ -48,10 +48,11 @@ class Scene(Paint):
         Appends the specified paint object to the given scene. Only paint objects
         added to the scene are considered rendering targets.
 
-        :param Paint paint: A handle to the paint object to be added to the scene.
-        This parameter must not be ``None``.
+        :param thorvg_python.paint.Paint paint:
+            A handle to the paint object to be added to the scene.
+            This parameter must not be ``None``.
 
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             Ownership of the ``paint`` object is transferred to the canvas upon
@@ -84,11 +85,12 @@ class Scene(Paint):
         given paint object ``at``. The ``at`` parameter must reference an existing
         paint object already added to the scene.
 
-        :param Paint at: A handle to an existing paint object in the scene before
-        which ``target`` will be inserted.
-        This parameter must not be ``None``.
+        :param thorvg_python.paint.Paint at:
+            A handle to an existing paint object in the scene before
+            which ``target`` will be inserted.
+            This parameter must not be ``None``.
 
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             Ownership of the ``target`` object is transferred to the scene upon
@@ -125,9 +127,9 @@ class Scene(Paint):
         performs to clear all paints from the scene.
 
         :param paint: A pointer to the Paint object to be removed from the scene.
-        If ``None``, remove all the paints from the scene.
+            If ``None``, remove all the paints from the scene.
 
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. seealso:: Scene.add()
         .. versionadded:: 1.0
@@ -154,7 +156,7 @@ class Scene(Paint):
         This function clears all effects that have been applied to the scene,
         restoring it to its original state without any post-processing.
 
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. versionadded:: 1.0
         """
@@ -183,7 +185,7 @@ class Scene(Paint):
         :param int border: Border handling method: 0 = duplicate, 1 = wrap.
         :param int quality: Blur quality level [0 - 100].
 
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. versionadded:: 1.0
         """
@@ -229,7 +231,7 @@ class Scene(Paint):
         :param float sigma: Gaussian blur sigma value for the shadow. Must be > 0.
         :param int quality: Blur quality level [0 - 100].
 
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. versionadded:: 1.0
         """
@@ -273,7 +275,7 @@ class Scene(Paint):
         :param int b: Blue color channel value [0 - 255].
         :param int a Alpha (opacity) channel value [0 - 255].
 
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. versionadded:: 1.0
         """

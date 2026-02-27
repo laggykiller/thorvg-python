@@ -49,7 +49,7 @@ class Saver:
         This might affect the encoding/decoding time in some cases. You can turn off the compression
         if you wish to optimize for speed.
 
-        :param Paint paint: The paint to be saved with all its associated properties.
+        :param thorvg_python.paint.Paint paint: The paint to be saved with all its associated properties.
         :param str path: A path to the file, in which the paint data is to be saved.
         :param bool quality: If ``true`` then compress data if possible.
 
@@ -58,7 +58,7 @@ class Saver:
             - Result.INSUFFICIENT_CONDITION Currently saving other resources.
             - Result.NOT_SUPPORTED Trying to save a file with an unknown extension or in an unsupported format.
             - Result.UNKNOWN An empty paint is to be saved.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             Saving can be asynchronous if the assigned thread number is greater than zero. To guarantee the saving is done, call Saver.sync() afterwards.
@@ -94,7 +94,7 @@ class Saver:
         This might affect the encoding/decoding time in some cases. You can turn off the compression
         if you wish to optimize for speed.
 
-        :param Animation animation: The animation to be saved with all its associated properties.
+        :param thorvg_python.animation.Animation animation: The animation to be saved with all its associated properties.
         :param str path: A path to the file, in which the animation data is to be saved.
         :param int quality: The encoded quality level. ``0`` is the minimum, ``100`` is the maximum value(recommended).
         :param int fps: The frames per second for the animation. If ``0``, the default fps is used.
@@ -104,7 +104,7 @@ class Saver:
             - Result.INSUFFICIENT_CONDITION Currently saving other resources or animation has no frames.
             - Result.NOT_SUPPORTED Trying to save a file with an unknown extension or in an unsupported format.
             - Result.UNKNOWN Unknown if attempting to save an empty paint.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             A higher frames per second (FPS) would result in a larger file size. It is recommended to use the default value.
@@ -144,7 +144,7 @@ class Saver:
         :return:
             - Result.INVALID_ARGUMENT A ``None`` passed as the argument.
             - Result.INSUFFICIENT_CONDITION No saving task is running.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             The asynchronous tasking is dependent on the Saver module implementation.
@@ -162,7 +162,7 @@ class Saver:
         """Deletes the given SaverPointer object.
 
         :return: Result.INVALID_ARGUMENT An invalid SaverPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         """
         self.thorvg_lib.tvg_saver_del.argtypes = [
             SaverPointer,

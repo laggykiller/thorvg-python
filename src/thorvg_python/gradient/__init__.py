@@ -30,10 +30,10 @@ class Gradient:
     ) -> Result:
         """Sets the parameters of the colors of the gradient and their position.
 
-        :param Sequence[ColorStop] color_stop: An array of ColorStop data structure.
+        :param Sequence[thorvg_python.base.ColorStop] color_stop: An array of ColorStop data structure.
 
         :return: Result.INVALID_ARGUMENT An invalid GradientPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         """
         color_stop_arr_type = ColorStop * len(color_stop)
         self.thorvg_lib.tvg_gradient_set_color_stops.argtypes = [
@@ -56,7 +56,7 @@ class Gradient:
         The function does not allocate any memory.
 
         :return: Result.INVALID_ARGUMENT A ``None`` passed as the argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: An array of ColorStop data structure.
         :rtype: Sequence[ColorStop]
         """
@@ -88,7 +88,7 @@ class Gradient:
         :param StrokeFill spread: The FillSpread value.
 
         :return: Result.INVALID_ARGUMENT An invalid GradientPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         """
         self.thorvg_lib.tvg_gradient_set_spread.argtypes = [
             GradientPointer,
@@ -104,7 +104,7 @@ class Gradient:
         """Gets the FillSpread value of the gradient object.
 
         :return: Result.INVALID_ARGUMENT A ``None`` passed as the argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The FillSpread value.
         :rtype: StrokeFill
         """
@@ -128,7 +128,7 @@ class Gradient:
         :param Matrix m The 3x3 augmented matrix.
 
         :return: Result.INVALID_ARGUMENT A ``None`` is passed as the argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         """
         self.thorvg_lib.tvg_gradient_set_transform.argtypes = [
             GradientPointer,
@@ -146,9 +146,9 @@ class Gradient:
         In case no transformation was applied, the identity matrix is set.
 
         :return: Result.INVALID_ARGUMENT A ``None`` is passed as the argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The 3x3 augmented matrix.
-        :rtype: Matrix
+        :rtype: thorvg_python.base.Matrix
         """
         m = Matrix()
         self.thorvg_lib.tvg_gradient_get_transform.argtypes = [
@@ -166,9 +166,9 @@ class Gradient:
         """Gets the unique value of the gradient instance indicating the instance type.
 
         :return: Result.INVALID_ARGUMENT In case a ``None`` is passed as the argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The unique type of the gradient instance type.
-        :rtype: TvgType
+        :rtype: thorvg_python.base.TvgType
 
         .. note::
             Experimental API
@@ -191,7 +191,7 @@ class Gradient:
         Creates a new object and sets its all properties as in the original object.
 
         :return: A copied GradientPointer object if succeed, ``None`` otherwise.
-        :rtype: GradientPointer
+        :rtype: thorvg_python.base.GradientPointer
         """
         self.thorvg_lib.tvg_gradient_duplicate.argtypes = [GradientPointer]
         self.thorvg_lib.tvg_gradient_duplicate.restype = GradientPointer
@@ -214,7 +214,7 @@ class Gradient:
         """Deletes the given gradient object.
 
         :return: Result.INVALID_ARGUMENT An invalid GradientPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         """
         self.thorvg_lib.tvg_gradient_del.argtypes = [GradientPointer]
         self.thorvg_lib.tvg_gradient_del.restype = Result

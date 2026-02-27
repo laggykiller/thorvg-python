@@ -41,10 +41,10 @@ class SwCanvas(Canvas):
         This method generates a software canvas instance that can be used for drawing vector graphics.
         It accepts an optional parameter ``op`` to choose between different rendering engine behaviors.
 
-        :param EngineOption op: The rendering engine option.
+        :param thorvg_python.engine.EngineOption op: The rendering engine option.
 
         :return: A new CanvasPointer object.
-        :rtype: CanvasPointer
+        :rtype: thorvg_python.base.CanvasPointer
 
         .. note::
             You need not call this method as it is auto called when initializing ``SwCanvas()``.
@@ -72,13 +72,13 @@ class SwCanvas(Canvas):
         :param int w: The width of the raster image.
         :param int h: The height of the raster image.
         :param Optional[int] stride: The stride of the raster image - default is same value as ``w``.
-        :param Colorspace cs: The colorspace value defining the way the 32-bits colors should be read/written.
+        :param thorvg.base.Colorspace cs: The colorspace value defining the way the 32-bits colors should be read/written.
 
         :return:
             - Result.INVALID_ARGUMENTS An invalid canvas or buffer pointer passed or one of the ``stride``, ``w`` or ``h`` being zero.
             - Result.INSUFFICIENT_CONDITION if the canvas is performing rendering. Please ensure the canvas is synced.
             - Result.NOT_SUPPORTED The software engine is not supported.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: A pointer to the allocated memory block of the size ``stride`` x ``h``.
         :rtype: ctypes.Array[ctypes.c_uint32]
 

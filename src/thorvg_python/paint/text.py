@@ -30,7 +30,7 @@ class Text(Paint):
         To properly destroy the Text object, use ``Paint.rel()``
 
         :return: A pointer to the newly created Text object.
-        :rtype: PaintPointer
+        :rtype: thorvg_python.base.PaintPointer
 
         .. versionadded:: 0.15
 
@@ -96,7 +96,7 @@ class Text(Paint):
         :return:
             - Result.INVALID_ARGUMENT A ``None`` passed as the ``paint`` argument.
             - Result.INVALID_ARGUMENT if the ``size`` is less than or equal to 0.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             Use this function in combination with ``font()`` to fully define text appearance.
@@ -207,7 +207,7 @@ class Text(Paint):
         The wrapping mode determines whether text is truncated, wrapped by character or word,
         or adjusted automatically. An ellipsis mode is also available for truncation with "...".
 
-        :param TextWrap mode: The wrapping strategy to apply. Default is ``NONE``.
+        :param thorvg_python.base.TextWrap mode: The wrapping strategy to apply. Default is ``NONE``.
 
         .. seealso:: TextWrap
         .. versionadded:: 1.0
@@ -266,13 +266,13 @@ class Text(Paint):
             Must be in the range [0.0, 0.5]. Recommended value is 0.18.
 
         :return: Result.INVALID_ARGUMENT A ``None`` passed as the ``paint`` argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             The ``shear`` factor will be clamped to the valid range if it exceeds the limits.
         .. note::
             This does not require the font itself to be italic.
-        It visually simulates the effect by applying a transformation matrix.
+            It visually simulates the effect by applying a transformation matrix.
 
         .. warning::
             Excessive slanting may cause visual distortion depending on the font and size.
@@ -337,7 +337,7 @@ class Text(Paint):
         :param int b: The blue color channel value in the range [0 ~ 255]. The default value is 0.
 
         :return: Result.INVALID_ARGUMENT A ``None`` passed as the ``paint`` argument.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             Either a solid color or a gradient fill is applied, depending on what was set as last.
@@ -366,12 +366,12 @@ class Text(Paint):
     ) -> Result:
         """Sets the gradient fill for the text.
 
-        :param GradientPointer grad: The linear or radial gradient fill
+        :param thorvg.base.GradientPointer gradient: The linear or radial gradient fill
 
         :return:
             - Result.INVALID_ARGUMENT A ``None`` passed as the ``paint`` argument.
             - Result.MEMORY_CORRUPTION An invalid GradientPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             Either a solid color or a gradient fill is applied, depending on what was set as last.
@@ -399,9 +399,9 @@ class Text(Paint):
         but do not include any transformations (e.g., scale, rotation, or translation).
 
         :return: A `TextMetrics` structure filled with the resulting values.
-        :rtype: TextMetrics
+        :rtype: thorvg_python.base.TextMetrics
         :return: TVG_RESULT_INSUFFICIENT_CONDITION if no font or size has been set yet.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. seealso:: TextMetrics
         .. note::
@@ -434,7 +434,7 @@ class Text(Paint):
         :return:
             - Result.INVALID_ARGUMENT An invalid ``path`` passed as an argument.
             - Result.NOT_SUPPORTED When trying to load a file with an unknown extension.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. seealso:: Engine.font_unload()
 
@@ -471,7 +471,7 @@ class Text(Paint):
             - Result.INVALID_ARGUMENT If no name is provided or if ``size`` is zero while ``data`` points to a valid memory location.
             - Result.NOT_SUPPORTED When trying to load a file with an unknown extension.
             - Result.INSUFFICIENT_CONDITION When trying to unload the font data that has not been previously loaded.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. warning::
             : It's the user responsibility to release the ``data`` memory.
@@ -522,7 +522,7 @@ class Text(Paint):
         :param str path: The path to the loaded font file.
 
         :return: Result.INSUFFICIENT_CONDITION The loader is not initialized.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             If the font data is currently in use, it will not be immediately unloaded.

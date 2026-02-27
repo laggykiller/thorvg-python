@@ -31,7 +31,7 @@ class Canvas:
     def destroy(self) -> Result:
         """Clears the canvas internal data, releases all paints stored by the canvas and destroys the canvas object itself.
 
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         """
         self.thorvg_lib.tvg_canvas_destroy.argtypes = [CanvasPointer]
         self.thorvg_lib.tvg_canvas_destroy.restype = Result
@@ -47,18 +47,21 @@ class Canvas:
         the canvas are considered rendering targets. The canvas retains the paint
         object until it is explicitly removed via Canvas.remove().
 
-        :param Paint paint: A handle to the paint object to be rendered.
+        :param thorvg_python.paint.Paint paint: A handle to the paint object to be rendered.
 
         :return: TVG_RESULT_INSUFFICIENT_CONDITION If the canvas is not in a valid state to accept new paints.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         ..note:: Ownership of the ``paint`` object is transferred to the canvas upon
             successful addition. To retain ownership, call ``Paint.ref()``
             before adding it to the canvas.
+
         ..note:: The rendering order of paint objects follows the order in which they are
             added to the canvas. If layering is required, ensure paints are added in
             the desired order.
+
         .. seealso:: Canvas.insert()
+
         .. seealso:: Canvas.remove()
         """
         self.thorvg_lib.tvg_canvas_add.argtypes = [
@@ -83,22 +86,25 @@ class Canvas:
         the specified paint in the root scene. If ``at`` is ``None``, the paint object
         is appended to the end of the root scene.
 
-        :param Paint paint: A handle to the paint object to be inserted into the root scene.
+        :param thorvg_python.paint.Paint target: A handle to the paint object to be inserted into the root scene.
             This parameter must not be ``None``.
         :param Optional[Paint] at: A handle to an existing paint object in the root scene before
             which ``target`` will be inserted. If ``None``, ``target`` is
             appended to the end of the root scene.
 
         :return: TVG_RESULT_INSUFFICIENT_CONDITION If the canvas is not in a valid state to accept new paints.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         ..note:: Ownership of the ``paint`` object is transferred to the canvas upon
             successful addition. To retain ownership, call ``Paint.ref()``
             before adding it to the canvas.
+
         ..note:: The rendering order of paint objects follows the order in which they are
             added to the canvas. If layering is required, ensure paints are added in
             the desired order.
+
         .. seealso:: Canvas.insert()
+
         .. seealso:: Canvas.remove()
         """
         if at is None:
@@ -130,14 +136,16 @@ class Canvas:
         object is specified (i.e., the default ``None`` is used), the function
         performs to clear all paints from the scene.
 
-        :param Paint paint: Paint object to be removed from the root scene.
+        :param Optional[thorvg_python.paint.Paint] paint: Paint object to be removed from the root scene.
             If ``None``, remove all the paints from the root scene.
 
         :return: Result.INVALID_ARGUMENT An invalid CanvasPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. seealso:: Canvas.add()
+
         .. seealso:: Canvas.insert()
+
         .. versionadded:: 1.0
         """
         if paint is None:
@@ -165,9 +173,9 @@ class Canvas:
         :return:
             - TVG_RESULT_INVALID_ARGUMENT An invalid CanvasPointer.
             - TVG_RESULT_INSUFFICIENT_CONDITION The canvas is not properly prepared.
-            This may occur if the canvas target has not been set or if the update is called during drawing.
-            Call Canvas.sync() before trying.
-        :rtype: Result
+              This may occur if the canvas target has not been set or if the update is called during drawing.
+              Call Canvas.sync() before trying.
+        :rtype: thorvg_python.base.Result
 
         .. note::
             Only paint objects that have been changed will be processed.
@@ -193,9 +201,9 @@ class Canvas:
         :return:
             - TVG_RESULT_INVALID_ARGUMENT An invalid CanvasPointer.
             - TVG_RESULT_INSUFFICIENT_CONDITION The canvas is not properly prepared.
-            This may occur if the canvas target has not been set or if the update is called during drawing.
-            without calling Canvas.sync() in between.
-        :rtype: Result
+              This may occur if the canvas target has not been set or if the update is called during drawing.
+              without calling Canvas.sync() in between.
+        :rtype: thorvg_python.base.Result
 
         .. note::
             Clearing the buffer is unnecessary if the canvas will be fully covered
@@ -223,7 +231,7 @@ class Canvas:
         the Canvas.sync() must be called after the Canvas.draw() regardless of threading.
 
         :return: TVG_RESULT_INVALID_ARGUMENT An invalid CanvasPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. seealso:: Canvas.draw()
         """
@@ -257,7 +265,7 @@ class Canvas:
         :return:
             - Result.INVALID_ARGUMENT An invalid CanvasPointer.
             - Result.INSUFFICIENT_CONDITION If the canvas is not in a synced state.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. seealso:: Canvas.sync()
         .. seealso:: SwCanvas.set_target()

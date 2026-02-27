@@ -41,7 +41,7 @@ class Accessor:
         """Deletes the given accessor object.
 
         :return: Result.INVALID_ARGUMENT An invalid AccessorPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. versionadded:: 1.0
         """
@@ -61,12 +61,12 @@ class Accessor:
         while calling func on each and passing the data pointer to this function. When
         func returns false iteration stops and the function returns.
 
-        :param Paint paint: A PaintPointer to the scene object.
-        :param Callable[[PaintPointer, bytes], bool] func: A function pointer to the function that will be execute for each child.
+        :param thorvg_python.paint.Paint paint: A PaintPointer to the scene object.
+        :param Callable[[thorvg_python.base.PaintPointer, bytes], bool] func: A function pointer to the function that will be execute for each child.
         :param bytes data: A void pointer to data that will be passed to the func.
 
         :result: INVALID_ARGUMENT An invalid AccessorPointer, PaintPointer, or function pointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. versionadded:: 1.0
         """

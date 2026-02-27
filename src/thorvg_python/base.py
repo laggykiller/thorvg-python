@@ -497,7 +497,7 @@ This callback is invoked when a Picture requires an external asset
 (such as an image or font resource). Implementations should load the asset
 into the given ``paint`` object.
 
-:param PaintPointer paint: The target paint object where the resolved asset will be loaded.
+:param thorvg_python.paint.PaintPointer paint: The target paint object where the resolved asset will be loaded.
 :param str src: The source path, identifier, or URI of the asset to be resolved.
 :param bytes data: User-provided custom data passed to the callback for context.
 

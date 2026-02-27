@@ -24,7 +24,7 @@ class LinearGradient(Gradient):
         """Creates a new linear gradient object.
 
         :return: A new linear gradient object.
-        :rtype: GradientPointer
+        :rtype: thorvg_python.base.GradientPointer
 
         .. note::
             You need not call this method as it is auto called when initializing ``LinearGradient()``.
@@ -51,7 +51,7 @@ class LinearGradient(Gradient):
         :param float y2: The vertical coordinate of the second point used to determine the gradient bounds.
 
         :return: Result.INVALID_ARGUMENT An invalid GradientPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             In case the first and the second points are equal, an object is filled with a single color using the last color specified in the Gradient.set_color_stops().
@@ -83,7 +83,7 @@ class LinearGradient(Gradient):
         (``x1``, ``y1``) and (``x2``, ``y2``).
 
         :return: Result.INVALID_ARGUMENT An invalid GradientPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The horizontal coordinate of the first point used to determine the gradient bounds.
         :rtype: float
         :return: The vertical coordinate of the first point used to determine the gradient bounds.

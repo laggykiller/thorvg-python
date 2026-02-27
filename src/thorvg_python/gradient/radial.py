@@ -24,7 +24,7 @@ class RadialGradient(Gradient):
         """Creates a new radial gradient object.
 
         :return: A new radial gradient object.
-        :rtype: GradientPointer
+        :rtype: thorvg_python.base.GradientPointer
 
         .. note::
             You need not call this method as it is auto called when initializing ``LinearGradient()``.
@@ -50,7 +50,7 @@ class RadialGradient(Gradient):
 
         :param float cx: The horizontal coordinate of the center of the end circle.
         :param float cy: The vertical coordinate of the center of the end circle.
-        :param float r The radius of the end circle.
+        :param float r: The radius of the end circle.
         :param float fx: The horizontal coordinate of the center of the start circle.
         :param float fy: The vertical coordinate of the center of the start circle.
         :param float fr: The radius of the start circle.
@@ -65,9 +65,9 @@ class RadialGradient(Gradient):
             If the start circle doesn't fully fit inside the end circle (after possible repositioning), the ``fr`` is reduced accordingly.
         .. note::
             By manipulating the position and size of the focal point, a wide range of visual effects can be achieved, such as directing
-        the gradient focus towards a specific edge or enhancing the depth and complexity of shading patterns.
-        If a focal effect is not desired, simply align the focal point (``fx`` and ``fy``) with the center of the end circle (``cx`` and ``cy``)
-        and set the radius (``fr``) to zero. This will result in a uniform gradient without any focal variations.
+            the gradient focus towards a specific edge or enhancing the depth and complexity of shading patterns.
+            If a focal effect is not desired, simply align the focal point (``fx`` and ``fy``) with the center of the end circle (``cx`` and ``cy``)
+            and set the radius (``fr``) to zero. This will result in a uniform gradient without any focal variations.
 
         .. seealso:: Gradient.set_color_stops()
         """
@@ -95,7 +95,7 @@ class RadialGradient(Gradient):
         """The function gets radial gradient attributes.
 
         :return: Result.INVALID_ARGUMENT An invalid GradientPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The horizontal coordinate of the center of the bounding circle.
         :rtype: float
         :return: The vertical coordinate of the center of the bounding circle.

@@ -28,7 +28,7 @@ class Picture(Paint):
         Note that you need not call this method as it is auto called when initializing ``Picture()``.
 
         :return: A new picture object.
-        :rtype: PaintPointer
+        :rtype: thorvg_python.base.PaintPointer
         """
         self.thorvg_lib.tvg_picture_new.restype = PaintPointer
         return self.thorvg_lib.tvg_picture_new()
@@ -48,7 +48,7 @@ class Picture(Paint):
         :return:
             - Result.INVALID_ARGUMENT An invalid PaintPointer or an empty ``path``.
             - Result.NOT_SUPPORTED A file with an unknown extension.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         """
         path_bytes = path.encode() + b"\x00"
         path_char = ctypes.create_string_buffer(path_bytes)
@@ -79,11 +79,11 @@ class Picture(Paint):
         :param bytes data: A pointer to a memory location where the content of the picture raw data is stored.
         :param int w: The width of the image ``data`` in pixels.
         :param int h: The height of the image ``data`` in pixels.
-        :param Colorspace cs: Specifies how the 32-bit color values should be interpreted (read/write).
+        :param thorvg.base.Colorspace cs: Specifies how the 32-bit color values should be interpreted (read/write).
         :param bool copy: If ``true`` the data are copied into the engine local buffer, otherwise they are not.
 
         :return: Result.INVALID_ARGUMENT An invalid PaintPointer or no data are provided or the ``w`` or ``h`` value is zero or less.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. versionadded:: 0.9
         """
@@ -128,7 +128,7 @@ class Picture(Paint):
         :return:
             - Result.INVALID_ARGUMENT In case a ``None`` is passed as the argument or the ``size`` is zero or less.
             - Result.NOT_SUPPORTED A file with an unknown extension.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. warning::
             : It's the user responsibility to release the ``data`` memory if the ``copy`` is ``true``.
@@ -178,7 +178,7 @@ class Picture(Paint):
         is encountered in a Picture object. It allows the user to provide a custom mechanism for loading
         or substituting assets, such as loading from an external source or a virtual filesystem.
 
-        :param Callable[[PaintPointer, ctypes.c_char_p, ctypes.c_void_p], bool] resolver:
+        :param Callable[[thorvg_python.base.PaintPointer, ctypes.c_char_p, ctypes.c_void_p], bool] resolver:
             A user-defined function that handles the resolution of asset paths.
             The function should return ``true`` if the asset was successfully resolved by the user, or ``false`` if it was not.
         :param bytes data:
@@ -188,11 +188,11 @@ class Picture(Paint):
         :return:
             - Result.INVALID_ARGUMENT A ``None`` passed as the ``picture`` argument.
             - Result.INSUFFICIENT_CONDITION If the ``picture`` is already loaded.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             This function must be called before ``Picture.load()``
-        Setting the resolver after loading will have no effect on asset resolution for that asset.
+            Setting the resolver after loading will have no effect on asset resolution for that asset.
         .. note::
             If ``false`` is returned by ``resolver``, ThorVG will attempt to resolve the resource using its internal resolution mechanism as a fallback.
         .. note::
@@ -231,7 +231,7 @@ class Picture(Paint):
         :param float h: A new height of the image in pixels.
 
         :return: Result.INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         """
         self.thorvg_lib.tvg_picture_set_size.argtypes = [
             PaintPointer,
@@ -249,7 +249,7 @@ class Picture(Paint):
         """Gets the size of the loaded picture.
 
         :return: Result.INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: A width of the image in pixels.
         :rtype: float
         :return: A height of the image in pixels.
@@ -286,16 +286,15 @@ class Picture(Paint):
         - (0.5f, 0.5f): center
         - (1.0f, 1.0f): bottom-right corner
 
-        :param picture: A PaintPointer to the picture object.
         :param x: The normalized x-coordinate of the origin point (range: 0.0f to 1.0f).
         :param y: The normalized y-coordinate of the origin point (range: 0.0f to 1.0f).
 
         :return: Result.INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             This origin directly affects how the Picture is placed on the canvas when using
-        transformations such as translate(), rotate(), or scale().
+            transformations such as translate(), rotate(), or scale().
 
         .. seealso:: Paint.translate()
         .. seealso:: Paint.rotate()
@@ -323,12 +322,8 @@ class Picture(Paint):
         This method retrieves the current origin point of the Picture, expressed
         in normalized coordinates relative to the picture’s bounds.
 
-        :param picture: A PaintPointer to the picture object.
-        :param x: The normalized x-coordinate of the origin (range: 0.0f to 1.0f).
-        :param y: The normalized y-coordinate of the origin (range: 0.0f to 1.0f).
-
         :return: Result.INVALID_ARGUMENT An invalid PaintPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. seealso:: Picture.set_origin()
         .. versionadded:: 1.0
@@ -355,7 +350,7 @@ class Picture(Paint):
 
         :param int _id: The Unique ID of the paint object.
         :return: A pointer to the paint object that matches the given identifier, or ``None`` if no matching paint object is found.
-        :rtype: PaintPointer
+        :rtype: thorvg_python.base.PaintPointer
 
         .. seealso:: Engine.accessor_generate_id()
         .. versionadded: 1.0

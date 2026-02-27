@@ -28,7 +28,7 @@ class Animation:
         """Creates a new Animation object.
 
         :return: AnimationPointer A new AnimationPointer object.
-        :rtype: AnimationPointer
+        :rtype: thorvg_python.base.AnimationPointer
 
         .. note::
             You need not call this method as it is auto called when initializing ``Animation()``.
@@ -50,7 +50,7 @@ class Animation:
             - Result.INVALID_ARGUMENT An invalid AnimationPointer.
             - Result.INSUFFICIENT_CONDITION if the given ``no`` is the same as the current frame value.
             - Result.NOT_SUPPORTED The picture data does not support animations.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. note::
             For efficiency, ThorVG ignores updates to the new frame value if the difference from the current frame value
@@ -101,7 +101,7 @@ class Animation:
         """Retrieves the current frame number of the animation.
 
         :return: Result.INVALID_ARGUMENT An invalid AnimationPointer or ``no``
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The current frame number of the animation, between 0 and totalFrame() - 1.
         :rtype: float
 
@@ -126,7 +126,7 @@ class Animation:
         """Retrieves the total number of frames in the animation.
 
         :return: Result.INVALID_ARGUMENT An invalid AnimationPointer or ``cnt``.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The total number of frames in the animation.
         :rtype: float
 
@@ -153,7 +153,7 @@ class Animation:
         """Retrieves the duration of the animation in seconds.
 
         :return: Result.INVALID_ARGUMENT An invalid AnimationPointer or ``duration``.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: The duration of the animation in seconds.
         :rtype: float
 
@@ -222,7 +222,7 @@ class Animation:
         :return:
             - Result.INSUFFICIENT_CONDITION In case the animation is not loaded.
             - Result.INVALID_ARGUMENT An invalid AnimationPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
         :return: segment begin frame.
         :rtype: float
         :return: segment end frame.
@@ -249,7 +249,7 @@ class Animation:
         """Deletes the given AnimationPointer object.
 
         :return: Result.INVALID_ARGUMENT An invalid AnimationPointer.
-        :rtype: Result
+        :rtype: thorvg_python.base.Result
 
         .. versionadded:: 0.13
         """
