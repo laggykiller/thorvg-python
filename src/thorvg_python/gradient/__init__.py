@@ -173,10 +173,10 @@ class Gradient:
         .. note::
             Experimental API
         """
-        _type = ctypes.c_uint8()
+        _type = ctypes.c_uint32()
         self.thorvg_lib.tvg_gradient_get_type.argtypes = [
             GradientPointer,
-            ctypes.POINTER(ctypes.c_uint8),
+            ctypes.POINTER(ctypes.c_uint32),
         ]
         self.thorvg_lib.tvg_gradient_get_type.restype = Result
         result = self.thorvg_lib.tvg_gradient_get_type(

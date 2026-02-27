@@ -647,7 +647,7 @@ class Shape(Paint):
         """
         self.thorvg_lib.tvg_shape_set_stroke_cap.argtypes = [
             PaintPointer,
-            ctypes.c_uint8,
+            ctypes.c_uint32,
         ]
         self.thorvg_lib.tvg_shape_set_stroke_cap.restype = Result
         return self.thorvg_lib.tvg_shape_set_stroke_cap(
@@ -663,10 +663,10 @@ class Shape(Paint):
         :return: The cap style value.
         :rtype: thorvg_python.base.StrokeCap
         """
-        cap = ctypes.c_uint8()
+        cap = ctypes.c_uint32()
         self.thorvg_lib.tvg_shape_get_stroke_cap.argtypes = [
             PaintPointer,
-            ctypes.POINTER(ctypes.c_uint8),
+            ctypes.POINTER(ctypes.c_uint32),
         ]
         self.thorvg_lib.tvg_shape_get_stroke_cap.restype = Result
         result = self.thorvg_lib.tvg_shape_get_stroke_cap(
@@ -878,12 +878,12 @@ class Shape(Paint):
         """
         self.thorvg_lib.tvg_shape_set_fill_rule.argtypes = [
             PaintPointer,
-            ctypes.c_uint8,
+            ctypes.c_uint32,
         ]
         self.thorvg_lib.tvg_shape_set_fill_rule.restype = Result
         return self.thorvg_lib.tvg_shape_set_fill_rule(
             self._paint,
-            ctypes.c_uint8(rule),
+            ctypes.c_uint32(rule),
         )
 
     def get_fill_rule(self) -> Tuple[Result, FillRule]:
@@ -897,10 +897,10 @@ class Shape(Paint):
         :return: TVG_RESULT_INVALID_ARGUMENT An invalid pointer passed as an argument.
         :rtype: thorvg_python.base.Result
         """
-        rule = ctypes.c_uint8()
+        rule = ctypes.c_uint32()
         self.thorvg_lib.tvg_shape_get_fill_rule.argtypes = [
             PaintPointer,
-            ctypes.POINTER(ctypes.c_uint8),
+            ctypes.POINTER(ctypes.c_uint32),
         ]
         self.thorvg_lib.tvg_shape_get_fill_rule.restype = Result
         result = self.thorvg_lib.tvg_shape_get_fill_rule(

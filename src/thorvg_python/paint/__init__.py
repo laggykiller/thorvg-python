@@ -614,10 +614,10 @@ class Paint:
         :return: The unique type of the paint instance type.
         :rtype: thorvg_python.base.TvgType
         """
-        _type = ctypes.c_uint8()
+        _type = ctypes.c_uint32()
         self.thorvg_lib.tvg_paint_get_type.argtypes = [
             PaintPointer,
-            ctypes.POINTER(ctypes.c_uint8),
+            ctypes.POINTER(ctypes.c_uint32),
         ]
         self.thorvg_lib.tvg_paint_get_type.restype = Result
         result = self.thorvg_lib.tvg_paint_get_type(
