@@ -43,7 +43,7 @@ rect.set_fill_color(32, 64, 128, 100)  # r, g, b, a
 canvas.push(rect)
 
 canvas.update()
-canvas.draw()
+canvas.draw(True)
 canvas.sync()
 
 im = canvas.get_pillow()
@@ -75,7 +75,7 @@ frame_duration = duration / total_frame
 for i in range(int(total_frame)):
     animation.set_frame(i)
     canvas.update()
-    canvas.draw()
+    canvas.draw(True)
     canvas.sync()
     im = canvas.get_pillow()
     ims.append(im)
