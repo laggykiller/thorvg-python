@@ -2,7 +2,7 @@
 
 A ctypes API for thorvg, with additional functions for getting Pillow Image.
 
-The functions mostly follow [thorvg/src/bindings/capi/thorvg_capi.h](https://github.com/thorvg/thorvg/blob/v0.15.16/src/bindings/capi/thorvg_capi.h)
+The functions mostly follow [thorvg/src/bindings/capi/thorvg_capi.h](https://github.com/thorvg/thorvg/blob/v1.0.1/src/bindings/capi/thorvg_capi.h)
 
 Documentations: https://thorvg-python.readthedocs.io/en/latest/
 
@@ -16,7 +16,7 @@ Documentations: https://thorvg-python.readthedocs.io/en/latest/
 
 Note that thorvg is included in the wheel package, you need not install libthorvg.
 Version bundled is the version available on [Conan](https://conan.io/center/recipes/thorvg)
-(Currently 0.15.16)
+(Currently 1.0.1)
 
 To install, run the following:
 ```bash
