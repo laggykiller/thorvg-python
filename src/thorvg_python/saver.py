@@ -2,7 +2,8 @@
 import ctypes
 from typing import Optional
 
-from .base import PaintStruct, Result, SaverStruct
+from .animation import Animation
+from .base import AnimationPointer, PaintPointer, Result, SaverPointer
 from .engine import Engine
 from .paint import Paint
 
@@ -17,7 +18,7 @@ class Saver:
     Once it's successfully exported to a file, it can be recreated using the Picture module.
     """
 
-    def __init__(self, engine: Engine, saver: Optional[SaverStruct] = None):
+    def __init__(self, engine: Engine, saver: Optional[SaverPointer] = None):
         self.engine = engine
         self.thorvg_lib = engine.thorvg_lib
         if saver is None:
@@ -25,21 +26,22 @@ class Saver:
         else:
             self._saver = saver
 
-    def _new(self) -> SaverStruct:
-        """Creates a new SaverStruct object.
+    def _new(self) -> SaverPointer:
+        """Creates a new SaverPointer object.
 
-        Note that you need not call this method as it is auto called when initializing ``Saver()``.
+        :return: A new SaverPointer object.
+        :rtype: SaverPointer
 
-        :return: A new SaverStruct object.
+        .. note:: You need not call this method as it is auto called when initializing ``Saver()``.
         """
-        self.thorvg_lib.tvg_saver_new.restype = ctypes.POINTER(SaverStruct)
-        return self.thorvg_lib.tvg_saver_new().contents
+        self.thorvg_lib.tvg_saver_new.restype = SaverPointer
+        return self.thorvg_lib.tvg_saver_new()
 
-    def save(
+    def save_paint(
         self,
         paint: Paint,
         path: str,
-        compress: bool,
+        quality: int,
     ) -> Result:
         """Exports the given ``paint`` data to the given ``path``
 
@@ -49,13 +51,13 @@ class Saver:
 
         :param Paint paint: The paint to be saved with all its associated properties.
         :param str path: A path to the file, in which the paint data is to be saved.
-        :param bool compress: If ``true`` then compress data if possible.
+        :param bool quality: If ``true`` then compress data if possible.
 
         :return:
-            - INVALID_ARGUMENT A ``nullptr`` passed as the argument.
-            - INSUFFICIENT_CONDITION Currently saving other resources.
-            - NOT_SUPPORTED Trying to save a file with an unknown extension or in an unsupported format.
-            - UNKNOWN An empty paint is to be saved.
+            - Result.INVALID_ARGUMENT A ``None`` passed as the argument.
+            - Result.INSUFFICIENT_CONDITION Currently saving other resources.
+            - Result.NOT_SUPPORTED Trying to save a file with an unknown extension or in an unsupported format.
+            - Result.UNKNOWN An empty paint is to be saved.
         :rtype: Result
 
         .. note::
@@ -65,18 +67,71 @@ class Saver:
         path_bytes = path.encode() + b"\x00"
         path_arr_type = ctypes.c_char * len(path)
         path_arr = path_arr_type.from_buffer_copy(path_bytes)
-        self.thorvg_lib.tvg_saver_save.argtypes = [
-            ctypes.POINTER(SaverStruct),
-            ctypes.POINTER(PaintStruct),
+        self.thorvg_lib.tvg_saver_save_paint.argtypes = [
+            SaverPointer,
+            PaintPointer,
             ctypes.POINTER(path_arr_type),
-            ctypes.c_bool,
+            ctypes.c_uint32,
         ]
-        self.thorvg_lib.tvg_saver_save.restype = Result
-        return self.thorvg_lib.tvg_saver_save(
-            ctypes.pointer(self._saver),
-            ctypes.pointer(paint._paint),  # type: ignore
+        self.thorvg_lib.tvg_saver_save_paint.restype = Result
+        return self.thorvg_lib.tvg_saver_save_paint(
+            self._saver,
+            paint._paint,  # type: ignore
             ctypes.pointer(path_arr),
-            ctypes.c_bool(compress),
+            ctypes.c_uint32(quality),
+        )
+
+    def save_animation(
+        self,
+        animation: Animation,
+        path: str,
+        quality: int,
+        fps: int,
+    ) -> Result:
+        """Exports the given ``animation`` data to the given ``path``
+
+        If the saver module supports any compression mechanism, it will optimize the data size.
+        This might affect the encoding/decoding time in some cases. You can turn off the compression
+        if you wish to optimize for speed.
+
+        :param Animation animation: The animation to be saved with all its associated properties.
+        :param str path: A path to the file, in which the animation data is to be saved.
+        :param int quality: The encoded quality level. ``0`` is the minimum, ``100`` is the maximum value(recommended).
+        :param int fps: The frames per second for the animation. If ``0``, the default fps is used.
+
+        :return:
+            - Result.INVALID_ARGUMENT A ``None`` passed as the argument.
+            - Result.INSUFFICIENT_CONDITION Currently saving other resources or animation has no frames.
+            - Result.NOT_SUPPORTED Trying to save a file with an unknown extension or in an unsupported format.
+            - Result.UNKNOWN Unknown if attempting to save an empty paint.
+        :rtype: Result
+
+        .. note::
+            A higher frames per second (FPS) would result in a larger file size. It is recommended to use the default value.
+        .. note::
+            Saving can be asynchronous if the assigned thread number is greater than zero. To guarantee the saving is done, call Saver.sync() afterwards.
+
+        .. seealso:: Saver.sync()
+
+        .. versionadded:: 1.0
+        """
+        path_bytes = path.encode() + b"\x00"
+        path_arr_type = ctypes.c_char * len(path)
+        path_arr = path_arr_type.from_buffer_copy(path_bytes)
+        self.thorvg_lib.tvg_saver_save_paint.argtypes = [
+            SaverPointer,
+            AnimationPointer,
+            ctypes.POINTER(path_arr_type),
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+        ]
+        self.thorvg_lib.tvg_saver_save_paint.restype = Result
+        return self.thorvg_lib.tvg_saver_save_paint(
+            self._saver,
+            animation._animation,  # type: ignore
+            ctypes.pointer(path_arr),
+            ctypes.c_uint32(quality),
+            ctypes.c_uint32(fps),
         )
 
     def sync(self) -> Result:
@@ -87,8 +142,8 @@ class Saver:
         Otherwise, you can call Saver.sync() immediately.
 
         :return:
-            - INVALID_ARGUMENT A ``nullptr`` passed as the argument.
-            - INSUFFICIENT_CONDITION No saving task is running.
+            - Result.INVALID_ARGUMENT A ``None`` passed as the argument.
+            - Result.INSUFFICIENT_CONDITION No saving task is running.
         :rtype: Result
 
         .. note::
@@ -96,23 +151,23 @@ class Saver:
         .. seealso:: Saver.save()
         """
         self.thorvg_lib.tvg_saver_sync.argtypes = [
-            ctypes.POINTER(SaverStruct),
+            SaverPointer,
         ]
         self.thorvg_lib.tvg_saver_sync.restype = Result
         return self.thorvg_lib.tvg_saver_sync(
-            ctypes.pointer(self._saver),
+            self._saver,
         )
 
     def _del(self) -> Result:
-        """Deletes the given SaverStruct object.
+        """Deletes the given SaverPointer object.
 
-        :return: INVALID_ARGUMENT An invalid SaverStruct pointer.
+        :return: Result.INVALID_ARGUMENT An invalid SaverPointer.
         :rtype: Result
         """
         self.thorvg_lib.tvg_saver_del.argtypes = [
-            ctypes.POINTER(SaverStruct),
+            SaverPointer,
         ]
         self.thorvg_lib.tvg_saver_del.restype = Result
         return self.thorvg_lib.tvg_saver_del(
-            ctypes.pointer(self._saver),
+            self._saver,
         )

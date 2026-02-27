@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import ctypes
+from typing import Optional
 
-from ..base import CanvasStruct, PaintStruct, Result
+from ..base import CanvasPointer, PaintPointer, Result
 from ..engine import Engine
 from ..paint import Paint
 
@@ -22,7 +23,7 @@ class Canvas:
     This is base Canvas class. Please instantiate `SwCanvas`, `GlCanvas` or `WgCanvas` instead
     """
 
-    def __init__(self, engine: Engine, canvas: CanvasStruct):
+    def __init__(self, engine: Engine, canvas: CanvasPointer):
         self.engine = engine
         self.thorvg_lib = engine.thorvg_lib
         self._canvas = canvas
@@ -30,175 +31,208 @@ class Canvas:
     def destroy(self) -> Result:
         """Clears the canvas internal data, releases all paints stored by the canvas and destroys the canvas object itself.
 
-        :return: INVALID_ARGUMENT An invalid pointer to the CanvasStruct object is passed.
         :rtype: Result
-
-        .. note::
-            If the paints from the canvas should not be released, the tvg_canvas_clear() with a ``free`` argument value set to ``false`` should be called.
-            Please be aware that in such a case TVG is not responsible for the paints release anymore and it has to be done manually in order to avoid memory leaks.
-
-        .. seealso:: Paint.del(), Canvas.clear()
         """
-        self.thorvg_lib.tvg_canvas_destroy.argtypes = [ctypes.POINTER(CanvasStruct)]
+        self.thorvg_lib.tvg_canvas_destroy.argtypes = [CanvasPointer]
         self.thorvg_lib.tvg_canvas_destroy.restype = Result
-        return self.thorvg_lib.tvg_canvas_destroy(ctypes.pointer(self._canvas))
+        return self.thorvg_lib.tvg_canvas_destroy(self._canvas)
 
-    def push(
+    def add(
         self,
         paint: "Paint",
     ) -> Result:
-        """Inserts a drawing element into the canvas using a PaintStruct object.
+        """Adds a paint object to the canvas for rendering.
 
-        :param Paint paint: The Paint object to be drawn.
+        Adds the specified paint into the canvas root scene. Only paints added to
+        the canvas are considered rendering targets. The canvas retains the paint
+        object until it is explicitly removed via Canvas.remove().
 
-        Only the paints pushed into the canvas will be drawing targets.
-        They are retained by the canvas until you call tvg_canvas_clear().
+        :param Paint paint: A handle to the paint object to be rendered.
 
-        :return:
-            - INVALID_ARGUMENT In case a ``nullptr`` is passed as the argument.
-            - INSUFFICIENT_CONDITION An internal error.
+        :return: TVG_RESULT_INSUFFICIENT_CONDITION If the canvas is not in a valid state to accept new paints.
         :rtype: Result
 
-        .. note::
-            The rendering order of the paints is the same as the order as they were pushed. Consider sorting the paints before pushing them if you intend to use layering.
-        .. seealso:: Canvas.clear()
+        ..note:: Ownership of the ``paint`` object is transferred to the canvas upon
+            successful addition. To retain ownership, call ``Paint.ref()``
+            before adding it to the canvas.
+        ..note:: The rendering order of paint objects follows the order in which they are
+            added to the canvas. If layering is required, ensure paints are added in
+            the desired order.
+        .. seealso:: Canvas.insert()
+        .. seealso:: Canvas.remove()
         """
-        self.thorvg_lib.tvg_canvas_push.argtypes = [
-            ctypes.POINTER(CanvasStruct),
-            ctypes.POINTER(PaintStruct),
+        self.thorvg_lib.tvg_canvas_add.argtypes = [
+            CanvasPointer,
+            PaintPointer,
         ]
-        self.thorvg_lib.tvg_canvas_push.restype = Result
-        return self.thorvg_lib.tvg_canvas_push(
-            ctypes.pointer(self._canvas),
-            ctypes.pointer(paint._paint),  # type: ignore
+        self.thorvg_lib.tvg_canvas_add.restype = Result
+        return self.thorvg_lib.tvg_canvas_add(
+            self._canvas,
+            paint._paint,  # type: ignore
         )
 
-    def reserve(self, n: int) -> Result:
-        """Reserves a memory block where the objects pushed into a canvas are stored.
-
-        If the number of PaintStructs to be stored in a canvas is known in advance, calling this function reduces the multiple
-        memory allocations thus improves the performance.
-
-        :param int n: The number of objects for which the memory is to be reserved.
-
-        :return: INVALID_ARGUMENT An invalid CanvasStruct pointer.
-        :rtype: Result
-
-        .. deprecated:: 0.10
-        .. note:: Malfunctional
-        """
-        self.thorvg_lib.tvg_canvas_reserve.argtypes = [
-            ctypes.POINTER(CanvasStruct),
-            ctypes.c_uint32,
-        ]
-        self.thorvg_lib.tvg_canvas_reserve.restype = Result
-        return self.thorvg_lib.tvg_canvas_reserve(
-            ctypes.pointer(self._canvas), ctypes.c_uint32(n)
-        )
-
-    def clear(
+    def insert(
         self,
-        free: bool,
+        target: Paint,
+        at: Optional[Paint],
     ) -> Result:
-        """Sets the total number of the paints pushed into the canvas to be zero.
-        PaintStruct objects stored in the canvas are released if ``free`` is set to true, otherwise the memory is not deallocated and
-        all paints should be released manually in order to avoid memory leaks.
+        """Inserts a paint object into the canvas root scene.
 
-        :param bool free: If ``true`` the memory occupied by paints is deallocated, otherwise it is not.
+        Inserts a paint object into the root scene of the specified canvas. If the
+        ``at`` parameter is provided, the paint object is inserted immediately before
+        the specified paint in the root scene. If ``at`` is ``None``, the paint object
+        is appended to the end of the root scene.
 
-        :return: INVALID_ARGUMENT An invalid CanvasStruct pointer.
+        :param Paint paint: A handle to the paint object to be inserted into the root scene.
+            This parameter must not be ``None``.
+        :param Optional[Paint] at: A handle to an existing paint object in the root scene before
+            which ``target`` will be inserted. If ``None``, ``target`` is
+            appended to the end of the root scene.
+
+        :return: TVG_RESULT_INSUFFICIENT_CONDITION If the canvas is not in a valid state to accept new paints.
         :rtype: Result
 
-        .. seealso:: Canvas.destroy()
+        ..note:: Ownership of the ``paint`` object is transferred to the canvas upon
+            successful addition. To retain ownership, call ``Paint.ref()``
+            before adding it to the canvas.
+        ..note:: The rendering order of paint objects follows the order in which they are
+            added to the canvas. If layering is required, ensure paints are added in
+            the desired order.
+        .. seealso:: Canvas.insert()
+        .. seealso:: Canvas.remove()
         """
-        self.thorvg_lib.tvg_canvas_clear.argtypes = [
-            ctypes.POINTER(CanvasStruct),
-            ctypes.c_bool,
+        if at is None:
+            at_type = ctypes.c_void_p
+            at_c = ctypes.c_void_p()
+        else:
+            at_type = PaintPointer
+            at_c = at._paint  # type: ignore
+
+        self.thorvg_lib.tvg_canvas_insert.argtypes = [
+            CanvasPointer,
+            PaintPointer,
+            at_type,
         ]
-        self.thorvg_lib.tvg_canvas_clear.restype = Result
-        return self.thorvg_lib.tvg_canvas_clear(
-            ctypes.pointer(self._canvas), ctypes.c_bool(free)
+        self.thorvg_lib.tvg_canvas_insert.restype = Result
+        return self.thorvg_lib.tvg_canvas_insert(
+            self._canvas,
+            target._paint,  # type: ignore
+            at_c,
+        )
+
+    def remove(
+        self,
+        paint: Optional[Paint] = None,
+    ) -> Result:
+        """Removes a paint object from the root scene.
+
+        This function removes a specified paint object from the root scene. If no paint
+        object is specified (i.e., the default ``None`` is used), the function
+        performs to clear all paints from the scene.
+
+        :param Paint paint: Paint object to be removed from the root scene.
+            If ``None``, remove all the paints from the root scene.
+
+        :return: Result.INVALID_ARGUMENT An invalid CanvasPointer.
+        :rtype: Result
+
+        .. seealso:: Canvas.add()
+        .. seealso:: Canvas.insert()
+        .. versionadded:: 1.0
+        """
+        if paint is None:
+            paint_type = ctypes.c_void_p
+            paint_ptr = ctypes.c_void_p()
+        else:
+            paint_type = PaintPointer
+            paint_ptr = paint._paint  # type: ignore
+        self.thorvg_lib.tvg_canvas_remove.argtypes = [
+            CanvasPointer,
+            paint_type,
+        ]
+        self.thorvg_lib.tvg_canvas_remove.restype = Result
+        return self.thorvg_lib.tvg_canvas_remove(
+            self._canvas,
+            paint_ptr,
         )
 
     def update(self) -> Result:
-        """Updates all paints in a canvas.
+        """Requests the canvas to update modified paint objects in preparation for rendering.
 
-        Should be called before drawing in order to prepare paints for the rendering.
+        This function triggers an internal update for all paint instances that have been modified
+        since the last update. It ensures that the canvas state is ready for accurate rendering.
 
-        :return: INVALID_ARGUMENT An invalid CanvasStruct pointer.
-        :rtype: Result
-
-        .. seealso:: Canvas.update_paint()
-        """
-        self.thorvg_lib.tvg_canvas_update.argtypes = [
-            ctypes.POINTER(CanvasStruct),
-        ]
-        self.thorvg_lib.tvg_canvas_update.restype = Result
-        return self.thorvg_lib.tvg_canvas_update(
-            ctypes.pointer(self._canvas),
-        )
-
-    def update_paint(self, paint: "Paint") -> Result:
-        """Updates the given PaintStruct object from the canvas before the rendering.
-
-        If a client application using the TVG library does not update the entire canvas with Canvas.update() in the frame
-        rendering process, PaintStruct objects previously added to the canvas should be updated manually with this function.
-
-        :param PaintStruct paint: The PaintStruct object to be updated.
-
-        :return: INVALID_ARGUMENT In case a ``nullptr`` is passed as the argument.
-        :rtype: Result
-
-        .. seealso:: Canvas.update()
-        """
-        self.thorvg_lib.tvg_canvas_update_paint.argtypes = [
-            ctypes.POINTER(CanvasStruct),
-            ctypes.POINTER(PaintStruct),
-        ]
-        self.thorvg_lib.tvg_canvas_update_paint.restype = Result
-        return self.thorvg_lib.tvg_canvas_update_paint(
-            ctypes.pointer(self._canvas),
-            ctypes.pointer(paint._paint),  # type: ignore
-        )
-
-    def draw(self) -> Result:
-        """Requests the canvas to draw the PaintStruct objects.
-
-        All paints from the given canvas will be rasterized to the buffer.
-
-        :return: INVALID_ARGUMENT An invalid CanvasStruct pointer.
+        :return:
+            - TVG_RESULT_INVALID_ARGUMENT An invalid CanvasPointer.
+            - TVG_RESULT_INSUFFICIENT_CONDITION The canvas is not properly prepared.
+            This may occur if the canvas target has not been set or if the update is called during drawing.
+            Call Canvas.sync() before trying.
         :rtype: Result
 
         .. note::
-            Drawing can be asynchronous based on the assigned thread number. To guarantee the drawing is done, call Canvas.sync() afterwards.
+            Only paint objects that have been changed will be processed.
+
+        .. note::
+            If the canvas is configured with multiple threads, the update may be performed asynchronously.
+
         .. seealso:: Canvas.sync()
         """
-        self.thorvg_lib.tvg_canvas_draw.argtypes = [
-            ctypes.POINTER(CanvasStruct),
+        self.thorvg_lib.tvg_canvas_update.argtypes = [
+            CanvasPointer,
         ]
-        self.thorvg_lib.tvg_canvas_draw.restype = Result
-        return self.thorvg_lib.tvg_canvas_draw(
-            ctypes.pointer(self._canvas),
+        self.thorvg_lib.tvg_canvas_update.restype = Result
+        return self.thorvg_lib.tvg_canvas_update(
+            self._canvas,
         )
 
-    def sync(self) -> Result:
-        """Guarantees that the drawing process is finished.
+    def draw(self, clear: bool) -> Result:
+        """Requests the canvas to render the Paint objects.
 
-        Since the canvas rendering can be performed asynchronously, it should be called after the Canvas.draw().
+        :param clear: If ``true``, clears the target buffer to zero before drawing.
 
         :return:
-            - INVALID_ARGUMENT An invalid CanvasStruct pointer.
-            - INSUFFICIENT_CONDITION ``canvas`` is either already in sync condition or in a damaged condition (a draw is required before syncing).
+            - TVG_RESULT_INVALID_ARGUMENT An invalid CanvasPointer.
+            - TVG_RESULT_INSUFFICIENT_CONDITION The canvas is not properly prepared.
+            This may occur if the canvas target has not been set or if the update is called during drawing.
+            without calling Canvas.sync() in between.
+        :rtype: Result
+
+        .. note::
+            Clearing the buffer is unnecessary if the canvas will be fully covered
+            with opaque content. Skipping the clear can improve performance.
+        .. note::
+            Drawing may be performed asynchronously if the thread count is greater than zero.
+            To ensure the drawing process is complete, call sync() afterwards.
+        .. note::
+            If the canvas has not been updated prior to Canvas.draw(), it may implicitly perform Canvas.update()
+
+        .. seealso:: Canvas.sync()
+        .. seealso:: Canvas.update()
+        """
+        self.thorvg_lib.tvg_canvas_draw.argtypes = [
+            CanvasPointer,
+            ctypes.c_bool,
+        ]
+        self.thorvg_lib.tvg_canvas_draw.restype = Result
+        return self.thorvg_lib.tvg_canvas_draw(self._canvas, ctypes.c_bool(clear))
+
+    def sync(self) -> Result:
+        """Guarantees that drawing task is finished.
+
+        The Canvas rendering can be performed asynchronously. To make sure that rendering is finished,
+        the Canvas.sync() must be called after the Canvas.draw() regardless of threading.
+
+        :return: TVG_RESULT_INVALID_ARGUMENT An invalid CanvasPointer.
         :rtype: Result
 
         .. seealso:: Canvas.draw()
         """
         self.thorvg_lib.tvg_canvas_sync.argtypes = [
-            ctypes.POINTER(CanvasStruct),
+            CanvasPointer,
         ]
         self.thorvg_lib.tvg_canvas_sync.restype = Result
         return self.thorvg_lib.tvg_canvas_sync(
-            ctypes.pointer(self._canvas),
+            self._canvas,
         )
 
     def set_viewport(
@@ -208,29 +242,39 @@ class Canvas:
         w: int,
         h: int,
     ) -> Result:
-        """Sets the drawing region in the canvas.
+        """Sets the drawing region of the canvas.
 
-        This function defines the rectangular area of the canvas that will be used for drawing operations.
-        The specified viewport is used to clip the rendering output to the boundaries of the rectangle.
+        This function defines a rectangular area of the canvas to be used for drawing operations.
+        The specified viewport clips rendering output to the boundaries of that rectangle.
 
-        :param int x: The x-coordinate of the upper-left corner of the rectangle.
-        :param int y: The y-coordinate of the upper-left corner of the rectangle.
-        :param int w: The width of the rectangle.
-        :param int h: The height of the rectangle.
+        Please note that changing the viewport is only allowed at the beginning of the rendering sequence—that is, after calling Canvas.sync().
 
-        :return: Result enumeration.
+        :param x: The x-coordinate of the upper-left corner of the rectangle.
+        :param y: The y-coordinate of the upper-left corner of the rectangle.
+        :param w: The width of the rectangle.
+        :param h: The height of the rectangle.
+
+        :return:
+            - Result.INVALID_ARGUMENT An invalid CanvasPointer.
+            - Result.INSUFFICIENT_CONDITION If the canvas is not in a synced state.
         :rtype: Result
 
+        .. seealso:: Canvas.sync()
+        .. seealso:: SwCanvas.set_target()
+        .. seealso:: GlCanvas.set_target()
+        .. seealso:: WgCanvas.set_target()
+
         .. warning::
-            It's not allowed to change the viewport during tvg_canvas_update() - tvg_canvas_sync() or tvg_canvas_push() - tvg_canvas_sync().
+            Changing the viewport is not allowed after calling Canvas.add(),
+            Canvas.remove(), Canvas.update(), or Canvas.draw().
 
         .. note::
-            When resetting the target, the viewport will also be reset to the target size.
-        .. seealso:: SwCanvas.set_target()
+            When the target is reset, the viewport will also be reset to match the target size.
+
         .. versionadded:: 0.15
         """
         self.thorvg_lib.tvg_canvas_set_viewport.argtypes = [
-            ctypes.POINTER(CanvasStruct),
+            CanvasPointer,
             ctypes.c_int32,
             ctypes.c_int32,
             ctypes.c_int32,
@@ -238,7 +282,7 @@ class Canvas:
         ]
         self.thorvg_lib.tvg_canvas_set_viewport.restype = Result
         return self.thorvg_lib.tvg_canvas_set_viewport(
-            ctypes.pointer(self._canvas),
+            self._canvas,
             ctypes.c_int32(x),
             ctypes.c_int32(y),
             ctypes.c_int32(w),

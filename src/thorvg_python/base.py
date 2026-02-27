@@ -3,44 +3,44 @@ import ctypes
 from enum import IntEnum
 
 
-class CanvasStruct(ctypes.Structure):
+class CanvasPointer(ctypes.c_void_p):
     """A structure responsible for managing and drawing graphical elements.
 
-    It sets up the target buffer, which can be drawn on the screen. It stores the PaintStruct objects (Shape, Scene, Picture).
+    It sets up the target buffer, which can be drawn on the screen. It stores the PaintPointer objects (Shape, Scene, Picture).
 
     .. note::
         You should use ``Canvas`` class instead.
     """
 
 
-class PaintStruct(ctypes.Structure):
+class PaintPointer(ctypes.c_void_p):
     """A structure representing a graphical element.
 
     .. warning::
-        The PaintStruct objects cannot be shared between Canvases.
+        The PaintPointer objects cannot be shared between Canvases.
 
     .. note::
         You should use ``Paint`` class instead.
     """
 
 
-class GradientStruct(ctypes.Structure):
-    """A structure representing a gradient fill of a PaintStruct object.
+class GradientPointer(ctypes.c_void_p):
+    """A structure representing a gradient fill of a PaintPointer object.
 
     .. note::
         You should use ``LinearGradient`` or ``RadialGradient`` class instead.
     """
 
 
-class SaverStruct(ctypes.Structure):
-    """A structure representing an object that enables to save a PaintStruct object into a file.
+class SaverPointer(ctypes.c_void_p):
+    """A structure representing an object that enables to save a PaintPointer object into a file.
 
     .. note::
         You should use `Saver` class instead.
     """
 
 
-class AnimationStruct(ctypes.Structure):
+class AnimationPointer(ctypes.c_void_p):
     """A structure representing an animation controller object.
 
     .. note::
@@ -48,15 +48,12 @@ class AnimationStruct(ctypes.Structure):
     """
 
 
-class EngineBackend(IntEnum):
-    """Enumeration specifying the engine type used for the graphics backend. For multiple backends bitwise operation is allowed."""
+class AccessorPointer(ctypes.c_void_p):
+    """A structure representing an object that enables iterating through a scene's descendents.
 
-    SW = 2  #: CPU rasterizer.
-    GL = 4  #: OpenGL rasterizer.
-
-    @classmethod
-    def from_param(cls, obj: int) -> int:
-        return int(obj)
+    .. note::
+        You should use ``Accessor`` class instead
+    """
 
 
 class Result(IntEnum):
@@ -88,48 +85,109 @@ class Result(IntEnum):
     NOT_SUPPORTED = 5
 
     #: The value returned in all other cases.
-    UNKNOWN = 6
+    UNKNOWN = 255
 
     @classmethod
     def from_param(cls, obj: int) -> int:
         return int(obj)
 
 
-class CompositeMethod(IntEnum):
-    """Enumeration indicating the method used in the composition of two objects - the target and the source.
+class Colorspace(IntEnum):
+    """Enumeration specifying the methods of combining the 8-bit color channels into 32-bit color.
 
-    .. deprecated:: 0.15
-        CLIP_PATH deprecated. Use Paint::clip() instead.
+    .. versionchanged:: 0.13
+        Added ``ABGR8888S`` and ``ARGB8888S``
 
-    .. versionchanged:: 0.9
-        Added LUMA_MASK
-
-    .. versionchanged:: 0.14
-        Added INVERSE_LUMA_MAS
+    .. versionchanged:: 1.0
+        Added ``UNKNOWN``
     """
+
+    #: The channels are joined in the order: alpha, blue, green, red.
+    #: Colors are alpha-premultiplied. (a << 24 | b << 16 | g << 8 | r)
+    ABGR8888 = 0
+
+    #: The channels are joined in the order: alpha, red, green, blue.
+    #: Colors are alpha-premultiplied. (a << 24 | r << 16 | g << 8 | b)
+    ARGB8888 = 1
+
+    #: The channels are joined in the order: alpha, blue, green, red.
+    #: Colors are un-alpha-premultiplied.
+    ABGR8888S = 2
+
+    #: The channels are joined in the order: alpha, red, green, blue.
+    #: Colors are un-alpha-premultiplied.
+    ARGB8888S = 3
+
+    #: Unknown channel data. This is reserved for an initial ColorSpace value.
+    UNKNOWN = 255
+
+    @classmethod
+    def from_param(cls, obj: int) -> int:
+        return int(obj)
+
+
+class EngineOption(IntEnum):
+    """Enumeration to specify rendering engine behavior.
+
+    .. note::
+        The availability or behavior of ``EngineMethod.SMART_RENDER`` may vary depending on platform or backend support.
+        It attempts to optimize rendering performance by updating only the regions  of the canvas that have
+        changed between frames (partial redraw). This can be highly effective in scenarios  where most of the
+        canvas remains static and only small portions are updated—such as simple animations or GUI interactions.
+        However, in complex scenes where a large portion of the canvas changes frequently (e.g., full-screen animations
+        or heavy object movements), the overhead of tracking changes and managing update regions may outweigh the benefits,
+        resulting in decreased performance compared to the default rendering mode. Thus, it is recommended to benchmark
+        both modes in your specific use case to determine the optimal setting.
+
+    .. versionadded:: 1.0
+    """
+
+    #: No engine options are enabled.
+    #: This may be used to explicitly disable all optional behaviors.
+    NONE = 0
+
+    #: Uses the default rendering mode
+    DEFAULT = 1
+
+    #: Enables automatic partial (smart) rendering optimizations.
+    SMART_RENDER = 2
+
+
+class MaskMethod(IntEnum):
+    """Enumeration indicating the method used in the masking of two objects - the target and the source."""
 
     #: No composition is applied.
     NONE = 0
 
-    #: The intersection of the source and the target is determined and only the resulting pixels
-    #: from the source are rendered. Note that ClipPath only supports the Shape type.
-    CLIP_PATH = 1
+    #: Alpha Masking using the masking target's pixels as an alpha value.
+    ALPHA = 1
 
-    #: The pixels of the source and the target are alpha blended.
-    #: As a result, only the part of the source, which intersects with the target is visible.
-    ALPHA_MASK = 2
+    #: Alpha Masking using the complement to the masking target's pixels as an alpha value.
+    INVERSE_ALPHA = 2
 
-    #: The pixels of the source and the complement to the target's pixels are alpha blended.
-    #: As a result, only the part of the source which is not covered by the target is visible.
-    INVERSE_ALPHA_MASK = 3
+    #: Alpha Masking using the grayscale (0.2126R + 0.7152G + 0.0722*B) of the masking target's pixels.
+    LUMA = 3
 
-    #: The source pixels are converted to grayscale (luma value) and alpha blended with the target.
-    #: As a result, only the part of the source which intersects with the target is visible.
-    LUMA_MASK = 4
+    #: Alpha Masking using the grayscale (0.2126R + 0.7152G + 0.0722*B) of the complement to the masking target's pixels.
+    INVERSE_LUMA = 4
 
-    #: The source pixels are converted to grayscale (luma value) and complement to the target's pixels
-    #: are alpha blended. As a result, only the part of the source which is not covered by the target is visible.
-    INVERSE_LUMA_MASK = 5
+    #: Combines the target and source objects pixels using target alpha. (T * TA) + (S * (255 - TA))
+    ADD = 5
+
+    #: Subtracts the source color from the target color while considering their respective target alpha. (T * TA) - (S * (255 - TA))
+    SUBTRACT = 6
+
+    #: Computes the result by taking the minimum value between the target alpha and the source alpha and multiplies it with the target color. (T * min(TA, SA))
+    INTERSECT = 7
+
+    #: Calculates the absolute difference between the target color and the source color multiplied by the complement of the target alpha. abs(T - S * (255 - TA))
+    DIFFERENCE = 8
+
+    #: Where multiple masks intersect, the highest transparency value is used.
+    LIGHTEN = 9
+
+    #: Where multiple masks intersect, the lowest transparency value is used.
+    DARKEN = 10
 
     @classmethod
     def from_param(cls, obj: int) -> int:
@@ -188,42 +246,23 @@ class BlendMethod(IntEnum):
     #: S + D - (2 * S * D)
     EXCLUSION = 11
 
-    #: Reserved. Not supported.
+    #: Combine with HSL(Sh + Ds + Dl) then convert it to RGB.
     HUE = 12
 
-    #: Reserved. Not supported.
+    #: Combine with HSL(Dh + Ss + Dl) then convert it to RGB.
     SATURATION = 13
 
-    #: Reserved. Not supported.
+    #: Combine with HSL(Sh + Ss + Dl) then convert it to RGB.
     COLOR = 14
 
-    #: Reserved. Not supported.
+    #: Combine with HSL(Dh + Ds + Sl) then convert it to RGB.
     LUMINOSITY = 15
 
     #: Simply adds pixel values of one layer with the other. (S + D)
     ADD = 16
 
-    #: Reserved. Not supported.
-    HARDMIX = 17
-
-    @classmethod
-    def from_param(cls, obj: int) -> int:
-        return int(obj)
-
-
-class Identifier(IntEnum):
-    """see TvgType
-
-    .. deprecated:: 0.15
-    """
-
-    UNDEF = 0  #: Undefined type.
-    SHAPE = 1  #: A shape type paint.
-    SCENE = 2  #: A scene type paint.
-    PICTURE = 3  #: A picture type paint.
-    LINEAR_GRAD = 4  #: A linear gradient type.
-    RADIAL_GRAD = 5  #: A radial gradient type.
-    TEXT = 6  #: A text type paint.
+    #: Used for intermediate composition.
+    COMPOSITION = 255
 
     @classmethod
     def from_param(cls, obj: int) -> int:
@@ -277,18 +316,18 @@ class PathCommand(IntEnum):
 class StrokeCap(IntEnum):
     """Enumeration determining the ending type of a stroke in the open sub-paths."""
 
-    #: The stroke is extended in both endpoints of a sub-path by a rectangle,
-    #: with the width equal to the stroke width and the length equal to half of the stroke width.
-    #: For zero length sub-paths the square is rendered with the size of the stroke width.
-    SQUARE = 0
+    #: The stroke ends exactly at each of the two endpoints of a sub-path.
+    #: For zero length sub-paths no stroke is rendered.
+    BUTT = 0
 
     #: The stroke is extended in both endpoints of a sub-path by a half circle,
     #: with a radius equal to half of the stroke width. For zero length sub-paths a full circle is rendered.
     ROUND = 1
 
-    #: The stroke ends exactly at each of the two endpoints of a sub-path.
-    #: For zero length sub-paths no stroke is rendered.
-    BUTT = 2
+    #: The stroke is extended in both endpoints of a sub-path by a rectangle,
+    #: with the width equal to the stroke width and the length equal to half of the stroke width.
+    #: For zero length sub-paths the square is rendered with the size of the stroke width.
+    SQUARE = 2
 
     @classmethod
     def from_param(cls, obj: int) -> int:
@@ -298,18 +337,18 @@ class StrokeCap(IntEnum):
 class StrokeJoin(IntEnum):
     """Enumeration specifying how to fill the area outside the gradient bounds."""
 
-    #: The outer corner of the joined path segments is bevelled at the join point.
-    #: The triangular region of the corner is enclosed by a straight line between the outer corners of each stroke.
-    BEVEL = 0
+    #: The outer corner of the joined path segments is spiked.
+    #: The spike is created by extension beyond the join point of the outer edges of the stroke until they intersect.
+    #: If the extension goes beyond the limit, the join style is converted to the Bevel styl
+    MITER = 0
 
     #: The outer corner of the joined path segments is rounded.
     #: The circular region is centered at the join point.
     ROUND = 1
 
-    #: The outer corner of the joined path segments is spiked.
-    #: The spike is created by extension beyond the join point of the outer edges of the stroke until they intersect.
-    #: If the extension goes beyond the limit, the join style is converted to the Bevel styl
-    MITER = 2
+    #: The outer corner of the joined path segments is bevelled at the join point.
+    #: The triangular region of the corner is enclosed by a straight line between the outer corners of each stroke.
+    BEVEL = 2
 
     @classmethod
     def from_param(cls, obj: int) -> int:
@@ -345,7 +384,7 @@ class FillRule(IntEnum):
     #: Starting from zero, if the path segment of the shape crosses the line clockwise,
     #: one is added, otherwise one is subtracted. If the resulting sum is non zero,
     #: the point is inside the shape.
-    WINDING = 0
+    NON_ZERO = 0
 
     #: A line from the point to a location outside the shape is drawn
     #: and its intersections with the path segments of the shape are counted.
@@ -368,11 +407,33 @@ class ColorStop(ctypes.Structure):
         ("a", ctypes.c_uint8),
     ]
 
-    offset: float  #: The relative position of the color.
-    r: int  #: The red color channel value in the range [0 ~ 255].
-    g: int  #: The green color channel value in the range [0 ~ 255].
-    b: int  #: The blue color channel value in the range [0 ~ 255].
-    a: int  #: The alpha channel value in the range [0 ~ 255], where 0 is completely transparent and 255 is opaque.
+    # offset: float  #: The relative position of the color.
+    # r: int  #: The red color channel value in the range [0 ~ 255].
+    # g: int  #: The green color channel value in the range [0 ~ 255].
+    # b: int  #: The blue color channel value in the range [0 ~ 255].
+    # a: int  #: The alpha channel value in the range [0 ~ 255], where 0 is completely transparent and 255 is opaque.
+
+
+class TextWrap(ctypes.Structure):
+    """A data structure storing the information about the color and its relative position inside the gradient bounds."""
+
+    #: Do not wrap text. Text is rendered on a single line and may overflow the bounding area.
+    TVG_TEXT_WRAP_NONE = 0
+
+    #: Wrap at the character level. If a word cannot fit, it is broken into individual characters to fit the line.
+    TVG_TEXT_WRAP_CHARACTER = 1
+
+    #: Wrap at the word level. Words that do not fit are moved to the next line.
+    TVG_TEXT_WRAP_WORD = 2
+
+    #: Smart choose wrapping method: word wrap first, falling back to character wrap if a word does not fit.
+    TVG_TEXT_WRAP_SMART = 3
+
+    #: Truncate overflowing text and append an ellipsis ("...") at the end. Typically used for single-line labels.
+    TVG_TEXT_WRAP_ELLIPSIS = 4
+
+    #: Reserved. No Support.
+    TVG_TEXT_WRAP_HYPHENATION = 5
 
 
 class PointStruct(ctypes.Structure):
@@ -407,41 +468,44 @@ class Matrix(ctypes.Structure):
     ]
 
 
-class MempoolPolicy(IntEnum):
-    """Enumeration specifying the methods of Memory Pool behavior policy."""
+class TextMetrics(ctypes.Structure):
+    """Describes the font metrics of a text object.
 
-    DEFAULT = 0  #: Default behavior that ThorVG is designed to.
-    SHAREABLE = 1  #: Memory Pool is shared among canvases.
-    INDIVIDUAL = 2  #: Allocate designated memory pool that is used only by the current canvas instance.
+    Provides the basic vertical layout metrics used for text rendering,
+    such as ascent, descent, and line spacing (linegap).
 
-    @classmethod
-    def from_param(cls, obj: int) -> int:
-        return int(obj)
-
-
-class Colorspace(IntEnum):
-    """Enumeration specifying the methods of combining the 8-bit color channels into 32-bit color.
-
-    .. versionchanged:: 0.13
-        Added ``ABGR8888S`` and ``ARGB8888S``
+    .. seealso:: Text.get_metrics()
+    .. note::
+        Experimental API
     """
+    _fields_ = [
+        ("ascent", ctypes.c_float),
+        ("descent", ctypes.c_float),
+        ("linegap", ctypes.c_float),
+        ("advance", ctypes.c_float),
+    ]
+    ascent: float #: Distance from the baseline to the top of the highest glyph (usually positive).
+    descent: float #: Distance from the baseline to the bottom of the lowest glyph (usually negative, as in TTF).
+    linegap: float #: Additional spacing recommended between lines (leading).
+    advance: float #: The total vertical advance between lines of text: ascent - descent + linegap (i.e., ascent + |descent| + linegap when descent is negative).
 
-    #: The channels are joined in the order: alpha, blue, green, red.
-    #: Colors are alpha-premultiplied. (a << 24 | b << 16 | g << 8 | r)
-    ABGR8888 = 0
+"""Callback function type for resolving external assets.
 
-    #: The channels are joined in the order: alpha, red, green, blue.
-    #: Colors are alpha-premultiplied. (a << 24 | r << 16 | g << 8 | b)
-    ARGB8888 = 1
+This callback is invoked when a Picture requires an external asset
+(such as an image or font resource). Implementations should load the asset
+into the given ``paint`` object.
 
-    #: The channels are joined in the order: alpha, blue, green, red.
-    #: Colors are un-alpha-premultiplied.
-    ABGR8888S = 2
+:param PaintPointer paint: The target paint object where the resolved asset will be loaded.
+:param str src: The source path, identifier, or URI of the asset to be resolved.
+:param bytes data: User-provided custom data passed to the callback for context.
 
-    #: The channels are joined in the order: alpha, red, green, blue.
-    #: Colors are un-alpha-premultiplied.
-    ARGB8888S = 3
+:return: true if the asset was successfully resolved and loaded into paint, otherwise false.
+:rtype: bool
 
-    @classmethod
-    def from_param(cls, obj: int) -> int:
-        return int(obj)
+.. seealso:: Picture.set_asset_resolver()
+.. note::
+    Experimental API
+"""
+PictureAssetResolverType = ctypes.CFUNCTYPE(
+    ctypes.c_bool, PaintPointer, ctypes.c_char_p, ctypes.c_void_p
+)

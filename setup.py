@@ -67,6 +67,7 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
         settings.append("os=Linux")
 
     settings.append(f"arch={arch}")
+    settings.append("build_type=Release")
 
     build.append("missing")
 
@@ -109,6 +110,15 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
                 f.write("[replace_tool_requires]\n")
                 f.write("cmake/*: cmake/[*]")
 
+    subprocess.run(
+        [
+            "conan",
+            "export",
+            "--version=1.0.1",
+            "thorvg_conan",
+        ]
+    )
+
     conan_output = os.path.join("conan_output", arch)
 
     result = subprocess.run(
@@ -122,8 +132,8 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
             conan_output,
             "--deployer=direct_deploy",
             "--format=json",
-            ".",
             "--profile:all=thorvg_python",
+            "--requires=thorvg/1.0.1",
         ],
         stdout=subprocess.PIPE,
     ).stdout.decode()
@@ -146,8 +156,7 @@ def fetch_thorvg(conan_info: Dict[Any, Any]) -> List[str]:
                 continue
             for lib_name in libs:
                 if platform.system() == "Windows":
-                    # https://github.com/conan-io/conan-center-index/blob/a83f000910e17ec8612c59fb881930a603d49ff2/recipes/thorvg/all/conanfile.py#L164-L166
-                    lib_filename = "{}-0.dll".format(lib_name)
+                    lib_filename = "{}.dll".format(lib_name)
                 elif platform.system() == "Darwin":
                     lib_filename = "lib{}.dylib".format(lib_name)
                 else:
@@ -183,7 +192,7 @@ def compile():
                 lib_paths[0],
                 lib_paths[1],
                 "-output",
-                "src/thorvg_python/libthorvg.dylib",
+                "src/thorvg_python/libthorvg-1.dylib",
             ]
         )
     else:

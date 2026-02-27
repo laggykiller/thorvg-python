@@ -1,7 +1,7 @@
 include README.md
 include LICENSE
-include conanfile.py
 include pyproject.toml
+recursive-include thorvg_conan *
 
 recursive-exclude */.pytest_cache *
 recursive-exclude */__pycache__ *

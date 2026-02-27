@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
 """thorvg-python"""
 
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 
 from .animation import Animation  # type: ignore  # noqa: F401
 from .animation.lottie import LottieAnimation  # type: ignore  # noqa: F401
 from .base import BlendMethod  # type: ignore  # noqa: F401
 from .base import Colorspace  # type: ignore  # noqa: F401
 from .base import ColorStop  # type: ignore  # noqa: F401
-from .base import CompositeMethod  # type: ignore  # noqa: F401
-from .base import EngineBackend  # type: ignore  # noqa: F401
 from .base import FillRule  # type: ignore  # noqa: F401
-from .base import Identifier  # type: ignore  # noqa: F401
+from .base import MaskMethod  # type: ignore  # noqa: F401
 from .base import Matrix  # type: ignore  # noqa: F401
-from .base import MempoolPolicy  # type: ignore  # noqa: F401
 from .base import PathCommand  # type: ignore  # noqa: F401
 from .base import PointStruct  # type: ignore  # noqa: F401
 from .base import Result  # type: ignore  # noqa: F401
@@ -21,6 +18,11 @@ from .base import StrokeCap  # type: ignore  # noqa: F401
 from .base import StrokeFill  # type: ignore  # noqa: F401
 from .base import StrokeJoin  # type: ignore  # noqa: F401
 from .base import TvgType  # type: ignore  # noqa: F401
+from .base import EngineOption  # type: ignore  # noqa: F401
+from .base import MaskMethod  # type: ignore  # noqa: F401
+from .base import TextMetrics  # type: ignore  # noqa: F401
+from .base import TextWrap  # type: ignore  # noqa: F401
+from .base import PictureAssetResolverType  # type: ignore  # noqa: F401
 from .canvas import Canvas  # type: ignore  # noqa: F401
 from .canvas.sw import SwCanvas  # type: ignore  # noqa: F401
 from .engine import Engine  # type: ignore  # noqa: F401

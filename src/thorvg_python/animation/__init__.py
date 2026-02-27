@@ -2,7 +2,7 @@
 import ctypes
 from typing import Optional, Tuple
 
-from ..base import AnimationStruct, PaintStruct, Result
+from ..base import AnimationPointer, PaintPointer, Result
 from ..engine import Engine
 from ..paint.picture import Picture
 
@@ -16,7 +16,7 @@ class Animation:
     The module supports the display and control of animation frames.
     """
 
-    def __init__(self, engine: Engine, animation: Optional[AnimationStruct] = None):
+    def __init__(self, engine: Engine, animation: Optional[AnimationPointer] = None):
         self.engine = engine
         self.thorvg_lib = engine.thorvg_lib
         if animation is None:
@@ -24,18 +24,19 @@ class Animation:
         else:
             self._animation = animation
 
-    def _new(self) -> AnimationStruct:
+    def _new(self) -> AnimationPointer:
         """Creates a new Animation object.
 
-        Note that you need not call this method as it is auto called when initializing ``Animation()``.
+        :return: AnimationPointer A new AnimationPointer object.
+        :rtype: AnimationPointer
 
-        :return: AnimationStruct A new AnimationStruct object.
-        :rtype: AnimationStruct
+        .. note::
+            You need not call this method as it is auto called when initializing ``Animation()``.
 
         .. versionadded:: 0.13
         """
-        self.thorvg_lib.tvg_animation_new.restype = ctypes.POINTER(AnimationStruct)
-        return self.thorvg_lib.tvg_animation_new().contents
+        self.thorvg_lib.tvg_animation_new.restype = AnimationPointer
+        return self.thorvg_lib.tvg_animation_new()
 
     def set_frame(
         self,
@@ -46,14 +47,14 @@ class Animation:
         :param float no: The index of the animation frame to be displayed. The index should be less than the Animation.get_total_frame().
 
         :return:
-            - INVALID_ARGUMENT An invalid AnimationStruct pointer.
-            - INSUFFICIENT_CONDITION if the given ``no`` is the same as the current frame value.
-            - NOT_SUPPORTED The picture data does not support animations.
+            - Result.INVALID_ARGUMENT An invalid AnimationPointer.
+            - Result.INSUFFICIENT_CONDITION if the given ``no`` is the same as the current frame value.
+            - Result.NOT_SUPPORTED The picture data does not support animations.
         :rtype: Result
 
         .. note::
             For efficiency, ThorVG ignores updates to the new frame value if the difference from the current frame value
-            is less than 0.001. In such cases, it returns ``Result::InsufficientCondition``.
+            is less than 0.001. In such cases, it returns ``Result.InsufficientCondition``.
             Values less than 0.001 may be disregarded and may not be accurately retained by the Animation.
 
         .. seealso:: Animation.get_total_frame()
@@ -61,12 +62,12 @@ class Animation:
         .. versionadded:: 0.13
         """
         self.thorvg_lib.tvg_animation_set_frame.argtypes = [
-            ctypes.POINTER(AnimationStruct),
+            AnimationPointer,
             ctypes.c_float,
         ]
         self.thorvg_lib.tvg_animation_set_frame.restype = Result
         return self.thorvg_lib.tvg_animation_set_frame(
-            ctypes.pointer(self._animation),
+            self._animation,
             ctypes.c_float(no),
         )
 
@@ -86,20 +87,20 @@ class Animation:
         .. versionadded:: 0.13
         """
         self.thorvg_lib.tvg_animation_get_picture.argtypes = [
-            ctypes.POINTER(AnimationStruct),
+            AnimationPointer,
         ]
-        self.thorvg_lib.tvg_animation_get_picture.restype = ctypes.POINTER(PaintStruct)
+        self.thorvg_lib.tvg_animation_get_picture.restype = PaintPointer
         return Picture(
             self.engine,
             self.thorvg_lib.tvg_animation_get_picture(
-                ctypes.pointer(self._animation),
-            ).contents,
+                self._animation,
+            ),
         )
 
     def get_frame(self) -> Tuple[Result, float]:
         """Retrieves the current frame number of the animation.
 
-        :return: INVALID_ARGUMENT An invalid AnimationStruct pointer or ``no``
+        :return: Result.INVALID_ARGUMENT An invalid AnimationPointer or ``no``
         :rtype: Result
         :return: The current frame number of the animation, between 0 and totalFrame() - 1.
         :rtype: float
@@ -111,12 +112,12 @@ class Animation:
         """
         no = ctypes.c_float()
         self.thorvg_lib.tvg_animation_get_frame.argtypes = [
-            ctypes.POINTER(AnimationStruct),
+            AnimationPointer,
             ctypes.POINTER(ctypes.c_float),
         ]
         self.thorvg_lib.tvg_animation_get_frame.restype = Result
         result = self.thorvg_lib.tvg_animation_get_frame(
-            ctypes.pointer(self._animation),
+            self._animation,
             ctypes.pointer(no),
         )
         return result, no.value
@@ -124,7 +125,7 @@ class Animation:
     def get_total_frame(self) -> Tuple[Result, float]:
         """Retrieves the total number of frames in the animation.
 
-        :return: INVALID_ARGUMENT An invalid AnimationStruct pointer or ``cnt``.
+        :return: Result.INVALID_ARGUMENT An invalid AnimationPointer or ``cnt``.
         :rtype: Result
         :return: The total number of frames in the animation.
         :rtype: float
@@ -138,12 +139,12 @@ class Animation:
         """
         cnt = ctypes.c_float()
         self.thorvg_lib.tvg_animation_get_total_frame.argtypes = [
-            ctypes.POINTER(AnimationStruct),
+            AnimationPointer,
             ctypes.POINTER(ctypes.c_float),
         ]
         self.thorvg_lib.tvg_animation_get_total_frame.restype = Result
         result = self.thorvg_lib.tvg_animation_get_total_frame(
-            ctypes.pointer(self._animation),
+            self._animation,
             ctypes.pointer(cnt),
         )
         return result, cnt.value
@@ -151,7 +152,7 @@ class Animation:
     def get_duration(self) -> Tuple[Result, float]:
         """Retrieves the duration of the animation in seconds.
 
-        :return: INVALID_ARGUMENT An invalid AnimationStruct pointer or ``duration``.
+        :return: Result.INVALID_ARGUMENT An invalid AnimationPointer or ``duration``.
         :rtype: Result
         :return: The duration of the animation in seconds.
         :rtype: float
@@ -163,12 +164,12 @@ class Animation:
         """
         duration = ctypes.c_float()
         self.thorvg_lib.tvg_animation_get_duration.argtypes = [
-            ctypes.POINTER(AnimationStruct),
+            AnimationPointer,
             ctypes.POINTER(ctypes.c_float),
         ]
         self.thorvg_lib.tvg_animation_get_duration.restype = Result
         result = self.thorvg_lib.tvg_animation_get_duration(
-            ctypes.pointer(self._animation),
+            self._animation,
             ctypes.pointer(duration),
         )
         return result, duration.value
@@ -180,25 +181,36 @@ class Animation:
     ) -> Result:
         """Specifies the playback segment of the animation.
 
-        :param float begin: segment begin.
-        :param float end: segment end.
+        The set segment is designated as the play area of the animation.
+        This is useful for playing a specific segment within the entire animation.
+        After setting, the number of animation frames and the playback time are calculated
+        by mapping the playback segment as the entire range.
+
+        :param begin: segment begin frame.
+        :param end: segment end frame.
 
         :return:
-            - INSUFFICIENT_CONDITION In case the animation is not loaded.
-            - INVALID_ARGUMENT When the given parameters are out of range.
-        :rtype: Result
+            - Result.INSUFFICIENT_CONDITION In case the animation is not loaded.
+            - Result.INVALID_ARGUMENT If the ``begin`` is higher than ``end``.
 
         .. note::
-            Experimental API
+            Animation allows a range from 0.0 to the total frame. ``end`` should not be higher than ``begin``.
+        .. note::
+            If a marker has been specified, its range will be disregarded.
+
+        .. seealso:: Animation.set_marker()
+        .. seealso:: Animation.get_total_frame()
+
+        .. versionadded:: 1.0
         """
         self.thorvg_lib.tvg_animation_set_segment.argtypes = [
-            ctypes.POINTER(AnimationStruct),
+            AnimationPointer,
             ctypes.c_float,
             ctypes.c_float,
         ]
         self.thorvg_lib.tvg_animation_set_segment.restype = Result
         result = self.thorvg_lib.tvg_animation_set_segment(
-            ctypes.pointer(self._animation),
+            self._animation,
             ctypes.c_float(begin),
             ctypes.c_float(end),
         )
@@ -208,44 +220,43 @@ class Animation:
         """Gets the current segment.
 
         :return:
-            - INSUFFICIENT_CONDITION In case the animation is not loaded.
-            - INVALID_ARGUMENT When the given parameters are ``nullptr``.
+            - Result.INSUFFICIENT_CONDITION In case the animation is not loaded.
+            - Result.INVALID_ARGUMENT An invalid AnimationPointer.
         :rtype: Result
-        :return: segment begin.
+        :return: segment begin frame.
         :rtype: float
-        :return: segment end.
+        :return: segment end frame.
         :rtype: float
 
-        .. note::
-            Experimental API
+        .. versionadded:: 1.0
         """
         begin = ctypes.c_float()
         end = ctypes.c_float()
         self.thorvg_lib.tvg_animation_get_segment.argtypes = [
-            ctypes.POINTER(AnimationStruct),
+            AnimationPointer,
             ctypes.POINTER(ctypes.c_float),
             ctypes.POINTER(ctypes.c_float),
         ]
         self.thorvg_lib.tvg_animation_get_segment.restype = Result
         result = self.thorvg_lib.tvg_animation_get_segment(
-            ctypes.pointer(self._animation),
+            self._animation,
             ctypes.pointer(begin),
             ctypes.pointer(end),
         )
         return result, begin.value, end.value
 
     def _del(self) -> Result:
-        """Deletes the given AnimationStruct object.
+        """Deletes the given AnimationPointer object.
 
-        :return: INVALID_ARGUMENT An invalid AnimationStruct pointer.
+        :return: Result.INVALID_ARGUMENT An invalid AnimationPointer.
         :rtype: Result
 
         .. versionadded:: 0.13
         """
         self.thorvg_lib.tvg_animation_del.argtypes = [
-            ctypes.POINTER(AnimationStruct),
+            AnimationPointer,
         ]
         self.thorvg_lib.tvg_animation_del.restype = Result
         return self.thorvg_lib.tvg_animation_del(
-            ctypes.pointer(self._animation),
+            self._animation,
         )

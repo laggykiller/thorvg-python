@@ -32,15 +32,14 @@ def test_engine():
     assert engine.init_result == tvg.Result.SUCCESS
     _, _, _, _, version = engine.version()
     assert version is not None
-    engine.term()
+    assert engine.term() == tvg.Result.SUCCESS
 
 
 def _test_swcanvas(
-    cs: tvg.Colorspace, mempool_policy: tvg.MempoolPolicy, with_stride: bool
+    cs: tvg.Colorspace, op: tvg.EngineOption, with_stride: bool
 ):
     engine = tvg.Engine()
-    canvas = tvg.SwCanvas(engine)
-    assert canvas.set_mempool(mempool_policy) == tvg.Result.SUCCESS
+    canvas = tvg.SwCanvas(engine, op)
     if with_stride:
         stride = 512
     else:
@@ -48,12 +47,12 @@ def _test_swcanvas(
     canvas.set_target(512, 256, stride, cs)
 
     rect = tvg.Shape(engine)
-    assert rect.append_rect(10, 10, 64, 64, 10, 10) == tvg.Result.SUCCESS
+    assert rect.append_rect(10, 10, 64, 64, 10, 10, True) == tvg.Result.SUCCESS
     assert rect.set_fill_color(32, 64, 128, 100) == tvg.Result.SUCCESS
-    assert canvas.push(rect) == tvg.Result.SUCCESS
+    assert canvas.add(rect) == tvg.Result.SUCCESS
 
     assert canvas.update() == tvg.Result.SUCCESS
-    assert canvas.draw() == tvg.Result.SUCCESS
+    assert canvas.draw(clear=True) == tvg.Result.SUCCESS
     assert canvas.sync() == tvg.Result.SUCCESS
 
     if PILLOW_LOADED:
@@ -65,31 +64,31 @@ def _test_swcanvas(
 
 
 def test_swcanvas_abgr8888():
-    _test_swcanvas(tvg.Colorspace.ABGR8888, tvg.MempoolPolicy.DEFAULT, True)
+    _test_swcanvas(tvg.Colorspace.ABGR8888, tvg.EngineOption.DEFAULT, True)
 
 
 def test_swcanvas_abgr8888s():
-    _test_swcanvas(tvg.Colorspace.ABGR8888S, tvg.MempoolPolicy.DEFAULT, True)
+    _test_swcanvas(tvg.Colorspace.ABGR8888S, tvg.EngineOption.DEFAULT, True)
 
 
 def test_swcanvas_argb8888():
-    _test_swcanvas(tvg.Colorspace.ARGB8888, tvg.MempoolPolicy.DEFAULT, True)
+    _test_swcanvas(tvg.Colorspace.ARGB8888, tvg.EngineOption.DEFAULT, True)
 
 
 def test_swcanvas_argb8888s():
-    _test_swcanvas(tvg.Colorspace.ARGB8888S, tvg.MempoolPolicy.DEFAULT, True)
+    _test_swcanvas(tvg.Colorspace.ARGB8888S, tvg.EngineOption.DEFAULT, True)
 
 
-def test_swcanvas_mempool_individual():
-    _test_swcanvas(tvg.Colorspace.ABGR8888, tvg.MempoolPolicy.INDIVIDUAL, True)
+def test_swcanvas_op_none():
+    _test_swcanvas(tvg.Colorspace.ABGR8888, tvg.EngineOption.NONE, True)
 
 
-def test_swcanvas_mempool_shareable():
-    _test_swcanvas(tvg.Colorspace.ABGR8888, tvg.MempoolPolicy.SHAREABLE, True)
+def test_swcanvas_op_smart_render():
+    _test_swcanvas(tvg.Colorspace.ABGR8888, tvg.EngineOption.SMART_RENDER, True)
 
 
 def test_swcanvas_no_stride():
-    _test_swcanvas(tvg.Colorspace.ABGR8888, tvg.MempoolPolicy.DEFAULT, False)
+    _test_swcanvas(tvg.Colorspace.ABGR8888, tvg.EngineOption.DEFAULT, False)
 
 
 def test_canvas_viewport():
@@ -102,18 +101,18 @@ def test_canvas_viewport():
 
     # Shape at left
     rect1 = tvg.Shape(engine)
-    assert rect1.append_rect(10, 10, 64, 64, 10, 10) == tvg.Result.SUCCESS
+    assert rect1.append_rect(10, 10, 64, 64, 10, 10, True) == tvg.Result.SUCCESS
     assert rect1.set_fill_color(32, 64, 128, 100) == tvg.Result.SUCCESS
-    assert canvas.push(rect1) == tvg.Result.SUCCESS
+    assert canvas.add(rect1) == tvg.Result.SUCCESS
 
     # Shape at right
     rect2 = tvg.Shape(engine)
-    assert rect2.append_rect(260, 10, 64, 64, 10, 10) == tvg.Result.SUCCESS
+    assert rect2.append_rect(260, 10, 64, 64, 10, 10, True) == tvg.Result.SUCCESS
     assert rect2.set_fill_color(32, 64, 128, 100) == tvg.Result.SUCCESS
-    assert canvas.push(rect2) == tvg.Result.SUCCESS
+    assert canvas.add(rect2) == tvg.Result.SUCCESS
 
     assert canvas.update() == tvg.Result.SUCCESS
-    assert canvas.draw() == tvg.Result.SUCCESS
+    assert canvas.draw(True) == tvg.Result.SUCCESS
     assert canvas.sync() == tvg.Result.SUCCESS
 
     if PILLOW_LOADED:
@@ -130,45 +129,18 @@ def test_canvas_clear():
     canvas.set_target(512, 256, 512)
 
     rect1 = tvg.Shape(engine)
-    assert rect1.append_rect(0, 0, 64, 64, 10, 10) == tvg.Result.SUCCESS
+    assert rect1.append_rect(0, 0, 64, 64, 10, 10, True) == tvg.Result.SUCCESS
     assert rect1.set_fill_color(128, 32, 64, 50) == tvg.Result.SUCCESS
-    assert canvas.push(rect1) == tvg.Result.SUCCESS
-    assert canvas.clear(True) == tvg.Result.SUCCESS
+    assert canvas.add(rect1) == tvg.Result.SUCCESS
+    assert canvas.remove(None) == tvg.Result.SUCCESS
 
     rect2 = tvg.Shape(engine)
-    assert rect2.append_rect(10, 10, 64, 64, 10, 10) == tvg.Result.SUCCESS
+    assert rect2.append_rect(10, 10, 64, 64, 10, 10, True) == tvg.Result.SUCCESS
     assert rect2.set_fill_color(32, 64, 128, 100) == tvg.Result.SUCCESS
-    assert canvas.push(rect2) == tvg.Result.SUCCESS
+    assert canvas.add(rect2) == tvg.Result.SUCCESS
 
     assert canvas.update() == tvg.Result.SUCCESS
-    assert canvas.draw() == tvg.Result.SUCCESS
-    assert canvas.sync() == tvg.Result.SUCCESS
-
-    if PILLOW_LOADED:
-        im = canvas.get_pillow()
-        assert check_im_same(im, "test_canvas_ref.png") is True
-
-    assert canvas.destroy() == tvg.Result.SUCCESS
-    assert engine.term() == tvg.Result.SUCCESS
-
-
-def test_canvas_update_paint():
-    engine = tvg.Engine()
-    canvas = tvg.SwCanvas(engine)
-    canvas.set_target(512, 256, 512)
-
-    rect = tvg.Shape(engine)
-    assert rect.append_rect(10, 10, 64, 64, 10, 10) == tvg.Result.SUCCESS
-    assert rect.set_fill_color(0, 0, 255, 100) == tvg.Result.SUCCESS
-    assert canvas.push(rect) == tvg.Result.SUCCESS
-
-    assert canvas.draw() == tvg.Result.SUCCESS
-    assert canvas.sync() == tvg.Result.SUCCESS
-
-    canvas.set_target(512, 256, 512)
-    assert rect.set_fill_color(32, 64, 128, 100) == tvg.Result.SUCCESS
-    assert canvas.update_paint(rect) == tvg.Result.SUCCESS
-    assert canvas.draw() == tvg.Result.SUCCESS
+    assert canvas.draw(True) == tvg.Result.SUCCESS
     assert canvas.sync() == tvg.Result.SUCCESS
 
     if PILLOW_LOADED:
@@ -198,9 +170,9 @@ def test_shape_path():
     assert shape.line_to(146, 143) == tvg.Result.SUCCESS
     assert shape.close() == tvg.Result.SUCCESS
     assert shape.set_fill_color(0, 0, 255, 255) == tvg.Result.SUCCESS
-    assert canvas.push(shape) == tvg.Result.SUCCESS
+    assert canvas.add(shape) == tvg.Result.SUCCESS
 
-    assert canvas.draw() == tvg.Result.SUCCESS
+    assert canvas.draw(True) == tvg.Result.SUCCESS
     assert canvas.sync() == tvg.Result.SUCCESS
 
     if PILLOW_LOADED:
@@ -242,7 +214,7 @@ def test_shape_path():
     assert shape.close() == tvg.Result.SUCCESS
     assert shape.set_fill_color(255, 0, 0, 255) == tvg.Result.SUCCESS
 
-    assert canvas.draw() == tvg.Result.SUCCESS
+    assert canvas.draw(True) == tvg.Result.SUCCESS
     assert canvas.sync() == tvg.Result.SUCCESS
 
     if PILLOW_LOADED:
@@ -259,11 +231,11 @@ def test_shape_append_rect():
     canvas.set_target(512, 256)
 
     shape = tvg.Shape(engine)
-    assert shape.append_rect(10, 10, 64, 64, 10, 10) == tvg.Result.SUCCESS
+    assert shape.append_rect(10, 10, 64, 64, 10, 10, True) == tvg.Result.SUCCESS
     assert shape.set_fill_color(32, 64, 128, 100) == tvg.Result.SUCCESS
-    assert canvas.push(shape) == tvg.Result.SUCCESS
+    assert canvas.add(shape) == tvg.Result.SUCCESS
 
-    assert canvas.draw() == tvg.Result.SUCCESS
+    assert canvas.draw(True) == tvg.Result.SUCCESS
     assert canvas.sync() == tvg.Result.SUCCESS
 
     if PILLOW_LOADED:
@@ -280,11 +252,11 @@ def test_shape_append_circle():
     canvas.set_target(512, 256)
 
     shape = tvg.Shape(engine)
-    assert shape.append_circle(256, 128, 64, 32) == tvg.Result.SUCCESS
+    assert shape.append_circle(256, 128, 64, 32, True) == tvg.Result.SUCCESS
     assert shape.set_fill_color(32, 64, 128, 100) == tvg.Result.SUCCESS
-    assert canvas.push(shape) == tvg.Result.SUCCESS
+    assert canvas.add(shape) == tvg.Result.SUCCESS
 
-    assert canvas.draw() == tvg.Result.SUCCESS
+    assert canvas.draw(True) == tvg.Result.SUCCESS
     assert canvas.sync() == tvg.Result.SUCCESS
 
     if PILLOW_LOADED:
@@ -295,60 +267,19 @@ def test_shape_append_circle():
     assert engine.term() == tvg.Result.SUCCESS
 
 
-def _test_shape_append_arc(pie: bool, ref: str):
-    engine = tvg.Engine()
-    canvas = tvg.SwCanvas(engine)
-    canvas.set_target(512, 256)
-
-    shape = tvg.Shape(engine)
-    assert shape.append_arc(256, 128, 64, 32, 120, pie) == tvg.Result.SUCCESS
-    assert shape.set_fill_color(32, 64, 128, 100) == tvg.Result.SUCCESS
-    assert canvas.push(shape) == tvg.Result.SUCCESS
-
-    assert canvas.draw() == tvg.Result.SUCCESS
-    assert canvas.sync() == tvg.Result.SUCCESS
-
-    if PILLOW_LOADED:
-        im = canvas.get_pillow()
-        assert check_im_same(im, ref) is True
-
-    assert canvas.destroy() == tvg.Result.SUCCESS
-    assert engine.term() == tvg.Result.SUCCESS
-
-
-def test_shape_append_arc_pie_true():
-    _test_shape_append_arc(True, "test_shape_append_arc_pie_true_ref.png")
-
-
-def test_shape_append_arc_pie_false():
-    _test_shape_append_arc(False, "test_shape_append_arc_pie_false_ref.png")
-
-
-def test_shape_get_path_coords():
-    engine = tvg.Engine()
-    shape = tvg.Shape(engine)
-    shape.append_rect(16, 32, 64, 128, 0, 0)
-
-    result, points = shape.get_path_coords()
-    assert result is tvg.Result.SUCCESS
-    points_list: List[Tuple[float, float]] = []
-    for point in points:
-        points_list.append((point.x, point.y))
-    assert points_list == [(16.0, 32.0), (80.0, 32.0), (80.0, 160.0), (16.0, 160.0)]
-
-    engine.term()
-
-
 def test_shape_get_path_commands():
     engine = tvg.Engine()
     shape = tvg.Shape(engine)
-    shape.append_rect(16, 32, 64, 128, 0, 0)
+    shape.append_rect(16, 32, 64, 128, 0, 0, True)
 
-    result, points = shape.get_path_commands()
+    result, cmds, pts = shape.get_path()
     assert result is tvg.Result.SUCCESS
     cmds_list: List[tvg.PathCommand] = []
-    for point in points:
-        cmds_list.append(point)
+    for cmd in cmds:
+        cmds_list.append(cmd)
+    pts_list: List[Tuple[float, float]] = []
+    for pt in pts:
+        pts_list.append((pt.x, pt.y))
     assert cmds_list == [
         tvg.PathCommand.MOVE_TO,
         tvg.PathCommand.LINE_TO,
@@ -356,7 +287,8 @@ def test_shape_get_path_commands():
         tvg.PathCommand.LINE_TO,
         tvg.PathCommand.CLOSE,
     ]
-    engine.term()
+    assert pts_list == [(80.0, 32.0), (80.0, 160.0), (16.0, 160.0), (16.0, 32.0)]
+    assert engine.term() == tvg.Result.SUCCESS
 
 
 def test_paint():
@@ -364,8 +296,8 @@ def test_paint():
     scene = tvg.Scene(engine)
 
     shape = tvg.Shape(engine)
-    assert scene.push(shape) == tvg.Result.SUCCESS
-    assert shape.append_rect(16, 32, 64, 128, 0, 0) == tvg.Result.SUCCESS
+    assert scene.add(shape) == tvg.Result.SUCCESS
+    assert shape.append_rect(16, 32, 64, 128, 0, 0, True) == tvg.Result.SUCCESS
     assert shape.scale(2.0) == tvg.Result.SUCCESS
     assert shape.rotate(45) == tvg.Result.SUCCESS
     assert shape.translate(60, 80) == tvg.Result.SUCCESS
@@ -397,23 +329,20 @@ def test_paint():
 
     shape2 = tvg.Shape(engine)
     assert (
-        shape.set_composite_method(shape2, tvg.CompositeMethod.ALPHA_MASK)
-        == tvg.Result.SUCCESS
+        shape.set_mask_method(shape2, tvg.MaskMethod.ALPHA) == tvg.Result.SUCCESS
     )
-    result, paint_struct, method = shape.get_composite_method()
+    result, method = shape.get_mask_method(shape2)
     assert result == tvg.Result.SUCCESS
-    assert isinstance(paint_struct, tvg.base.PaintStruct)
-    assert method == tvg.CompositeMethod.ALPHA_MASK
+    assert method == tvg.MaskMethod.ALPHA
 
     shape3 = tvg.Shape(engine)
     assert shape.set_clip(shape3) == tvg.Result.SUCCESS
     assert shape.get_type() == (tvg.Result.SUCCESS, tvg.TvgType.SHAPE)
-    assert shape.get_identifier() == (tvg.Result.SUCCESS, tvg.Identifier.SHAPE)
     assert shape.set_blend_method(tvg.BlendMethod.ADD) == tvg.Result.SUCCESS
 
-    assert isinstance(shape.duplicate(), tvg.base.PaintStruct)
+    # assert isinstance(shape.duplicate(), tvg.base.PaintPointer)
 
-    engine.term()
+    assert engine.term() == tvg.Result.SUCCESS
 
 
 def test_stroke():
@@ -436,10 +365,10 @@ def test_stroke():
     assert line.set_stroke_join(tvg.StrokeJoin.MITER) == tvg.Result.SUCCESS
     assert line.set_stroke_miterlimit(3.0) == tvg.Result.SUCCESS
     pattern = [7.0, 10.0]
-    assert line.set_stroke_dash(pattern) == tvg.Result.SUCCESS
-    assert canvas.push(line) == tvg.Result.SUCCESS
+    assert line.set_stroke_dash(pattern, 0) == tvg.Result.SUCCESS
+    assert canvas.add(line) == tvg.Result.SUCCESS
 
-    assert canvas.draw() == tvg.Result.SUCCESS
+    assert canvas.draw(True) == tvg.Result.SUCCESS
     assert canvas.sync() == tvg.Result.SUCCESS
 
     if PILLOW_LOADED:
@@ -449,7 +378,7 @@ def test_stroke():
     assert line.get_stroke_width() == (tvg.Result.SUCCESS, 5.0)
     assert line.get_stroke_color() == (tvg.Result.SUCCESS, 32, 64, 128, 100)
     assert line.get_stroke_cap() == (tvg.Result.SUCCESS, tvg.StrokeCap.ROUND)
-    assert line.get_stroke_dash() == (tvg.Result.SUCCESS, pattern)
+    assert line.get_stroke_dash() == (tvg.Result.SUCCESS, pattern, 0.0)
     assert line.get_stroke_join() == (tvg.Result.SUCCESS, tvg.StrokeJoin.MITER)
     assert line.get_stroke_miterlimit() == (tvg.Result.SUCCESS, 3.0)
 
@@ -463,7 +392,7 @@ def test_fill():
     canvas.set_target(512, 256)
 
     shape = tvg.Shape(engine)
-    assert shape.append_rect(10, 10, 64, 64, 10, 10) == tvg.Result.SUCCESS
+    assert shape.append_rect(10, 10, 64, 64, 10, 10, True) == tvg.Result.SUCCESS
 
     assert shape.set_fill_rule(tvg.FillRule.EVEN_ODD) == tvg.Result.SUCCESS
     assert shape.set_fill_color(32, 64, 128, 100) == tvg.Result.SUCCESS
@@ -471,9 +400,9 @@ def test_fill():
     assert shape.set_stroke_color(128, 64, 32, 150) == tvg.Result.SUCCESS
     assert shape.set_stroke_width(3) == tvg.Result.SUCCESS
 
-    assert canvas.push(shape) == tvg.Result.SUCCESS
+    assert canvas.add(shape) == tvg.Result.SUCCESS
 
-    assert canvas.draw() == tvg.Result.SUCCESS
+    assert canvas.draw(True) == tvg.Result.SUCCESS
     assert canvas.sync() == tvg.Result.SUCCESS
 
     if PILLOW_LOADED:
@@ -493,7 +422,7 @@ def _test_gradient(gradient_type: str):
     canvas.set_target(512, 256)
 
     shape = tvg.Shape(engine)
-    assert shape.append_rect(0, 0, 512, 256, 0, 0) == tvg.Result.SUCCESS
+    assert shape.append_rect(0, 0, 512, 256, 0, 0, True) == tvg.Result.SUCCESS
 
     fill: tvg.Gradient
     if gradient_type == "linear":
@@ -513,17 +442,17 @@ def _test_gradient(gradient_type: str):
     if isinstance(fill, tvg.LinearGradient):
         assert fill.set(0, 0, 100, 100) == tvg.Result.SUCCESS
     elif isinstance(fill, tvg.RadialGradient):  # type: ignore
-        assert fill.set(100, 100, 50) == tvg.Result.SUCCESS
+        assert fill.set(100, 100, 50, 100, 100, 50) == tvg.Result.SUCCESS
     else:
         raise RuntimeError(f"Invalid fill type {type(fill)}")
 
     assert fill.set_color_stops(color_stops) == tvg.Result.SUCCESS
     assert fill.set_spread(tvg.StrokeFill.REFLECT) == tvg.Result.SUCCESS
     assert fill.set_transform(matrix) == tvg.Result.SUCCESS
-    assert shape.set_linear_gradient(fill) == tvg.Result.SUCCESS
-    assert canvas.push(shape) == tvg.Result.SUCCESS
+    assert shape.set_gradient(fill) == tvg.Result.SUCCESS
+    assert canvas.add(shape) == tvg.Result.SUCCESS
 
-    assert canvas.draw() == tvg.Result.SUCCESS
+    assert canvas.draw(True) == tvg.Result.SUCCESS
     assert canvas.sync() == tvg.Result.SUCCESS
 
     if PILLOW_LOADED:
@@ -535,8 +464,10 @@ def _test_gradient(gradient_type: str):
 
     if isinstance(fill_out, tvg.LinearGradient):
         assert fill_out.get() == (tvg.Result.SUCCESS, 0, 0, 100, 100)
+        assert isinstance(fill_out.duplicate(), tvg.LinearGradient)
     elif isinstance(fill_out, tvg.RadialGradient):  # type: ignore
-        assert fill_out.get() == (tvg.Result.SUCCESS, 100, 100, 50)
+        assert fill_out.get() == (tvg.Result.SUCCESS, 100, 100, 50, 100, 100, 50)
+        assert isinstance(fill_out.duplicate(), tvg.RadialGradient)
     else:
         raise RuntimeError(f"Invalid fill_out type {type(fill_out)}")
 
@@ -585,9 +516,9 @@ def _test_picture_load(test_file: str, ref: str):
     assert picture.load(os.path.join(file_dir, test_file)) == tvg.Result.SUCCESS
     assert picture.set_size(256, 256) == tvg.Result.SUCCESS
     assert picture.translate(0, 0) == tvg.Result.SUCCESS
-    assert canvas.push(picture) == tvg.Result.SUCCESS
+    assert canvas.add(picture) == tvg.Result.SUCCESS
 
-    assert canvas.draw() == tvg.Result.SUCCESS
+    assert canvas.draw(True) == tvg.Result.SUCCESS
     assert canvas.sync() == tvg.Result.SUCCESS
 
     if PILLOW_LOADED:
@@ -633,14 +564,14 @@ def _test_picture_load_raw(test_file: str, ref: str, copy: bool):
         im_bytes = im.tobytes()  # type: ignore
 
     picture = tvg.Picture(engine)
-    assert picture.load_raw(im_bytes, im_w, im_h, copy) == tvg.Result.SUCCESS
+    assert picture.load_raw(im_bytes, im_w, im_h, tvg.Colorspace.ABGR8888, copy) == tvg.Result.SUCCESS
     if copy is True:
         del im_bytes
     assert picture.set_size(256, 256) == tvg.Result.SUCCESS
     assert picture.translate(0, 0) == tvg.Result.SUCCESS
-    assert canvas.push(picture) == tvg.Result.SUCCESS
+    assert canvas.add(picture) == tvg.Result.SUCCESS
 
-    assert canvas.draw() == tvg.Result.SUCCESS
+    assert canvas.draw(True) == tvg.Result.SUCCESS
     assert canvas.sync() == tvg.Result.SUCCESS
 
     if PILLOW_LOADED:
@@ -675,14 +606,14 @@ def _test_picture_load_data(test_file: str, ref: str, mimetype: str, copy: bool)
         data = f.read()
 
     picture = tvg.Picture(engine)
-    assert picture.load_data(data, mimetype, copy) == tvg.Result.SUCCESS
+    assert picture.load_data(data, mimetype, None, copy) == tvg.Result.SUCCESS
     if copy is False:
         del data
     assert picture.set_size(256, 256) == tvg.Result.SUCCESS
     assert picture.translate(0, 0) == tvg.Result.SUCCESS
-    assert canvas.push(picture) == tvg.Result.SUCCESS
+    assert canvas.add(picture) == tvg.Result.SUCCESS
 
-    assert canvas.draw() == tvg.Result.SUCCESS
+    assert canvas.draw(True) == tvg.Result.SUCCESS
     assert canvas.sync() == tvg.Result.SUCCESS
 
     if PILLOW_LOADED:
@@ -766,13 +697,13 @@ def test_scene():
 
     scene = tvg.Scene(engine)
     rect = tvg.Shape(engine)
-    assert rect.append_rect(10, 10, 64, 64, 10, 10) == tvg.Result.SUCCESS
+    assert rect.append_rect(10, 10, 64, 64, 10, 10, True) == tvg.Result.SUCCESS
     assert rect.set_fill_color(32, 64, 128, 100) == tvg.Result.SUCCESS
-    assert scene.push(rect) == tvg.Result.SUCCESS
+    assert scene.add(rect) == tvg.Result.SUCCESS
 
-    assert canvas.push(scene) == tvg.Result.SUCCESS
+    assert canvas.add(scene) == tvg.Result.SUCCESS
     assert canvas.update() == tvg.Result.SUCCESS
-    assert canvas.draw() == tvg.Result.SUCCESS
+    assert canvas.draw(True) == tvg.Result.SUCCESS
     assert canvas.sync() == tvg.Result.SUCCESS
 
     if PILLOW_LOADED:
@@ -788,21 +719,21 @@ def test_scene_clear():
     canvas = tvg.SwCanvas(engine)
     canvas.set_target(512, 256, 512)
     scene = tvg.Scene(engine)
-    assert canvas.push(scene) == tvg.Result.SUCCESS
+    assert canvas.add(scene) == tvg.Result.SUCCESS
 
     rect1 = tvg.Shape(engine)
-    assert rect1.append_rect(0, 0, 64, 64, 10, 10) == tvg.Result.SUCCESS
+    assert rect1.append_rect(0, 0, 64, 64, 10, 10, True) == tvg.Result.SUCCESS
     assert rect1.set_fill_color(128, 32, 64, 50) == tvg.Result.SUCCESS
-    assert scene.push(rect1) == tvg.Result.SUCCESS
-    assert scene.clear(True) == tvg.Result.SUCCESS
+    assert scene.add(rect1) == tvg.Result.SUCCESS
+    assert scene.remove(None) == tvg.Result.SUCCESS
 
     rect2 = tvg.Shape(engine)
-    assert rect2.append_rect(10, 10, 64, 64, 10, 10) == tvg.Result.SUCCESS
+    assert rect2.append_rect(10, 10, 64, 64, 10, 10, True) == tvg.Result.SUCCESS
     assert rect2.set_fill_color(32, 64, 128, 100) == tvg.Result.SUCCESS
-    assert scene.push(rect2) == tvg.Result.SUCCESS
+    assert scene.add(rect2) == tvg.Result.SUCCESS
 
     assert canvas.update() == tvg.Result.SUCCESS
-    assert canvas.draw() == tvg.Result.SUCCESS
+    assert canvas.draw(True) == tvg.Result.SUCCESS
     assert canvas.sync() == tvg.Result.SUCCESS
 
     if PILLOW_LOADED:
@@ -819,21 +750,21 @@ def _test_text(font: str, unicode: bool):
     canvas = tvg.SwCanvas(engine)
     canvas.set_target(512, 256, 512)
 
-    # assert engine.font_load(os.path.join(file_dir, font)) == tvg.Result.SUCCESS
-    assert engine.font_load(os.path.join("tests", font)) == tvg.Result.SUCCESS
-
     text1 = tvg.Text(engine)
-    assert text1.set_font(font_name, 32, None) == tvg.Result.SUCCESS
+    assert text1.font_load(os.path.join("tests", font)) == tvg.Result.SUCCESS
+    assert text1.set_font(font_name) == tvg.Result.SUCCESS
+    assert text1.set_size(32) == tvg.Result.SUCCESS
     assert (
         text1.set_text(f"Solid Text {'テスト' if unicode is True else ''}")
         == tvg.Result.SUCCESS
     )
-    assert text1.set_fill_color(0, 0, 0) == tvg.Result.SUCCESS
+    assert text1.set_color(0, 0, 0) == tvg.Result.SUCCESS
     assert text1.translate(10, 10) == tvg.Result.SUCCESS
-    assert canvas.push(text1) == tvg.Result.SUCCESS
+    assert canvas.add(text1) == tvg.Result.SUCCESS
 
     text2 = tvg.Text(engine)
-    assert text2.set_font(font_name, 32, None) == tvg.Result.SUCCESS
+    assert text2.set_font(font_name) == tvg.Result.SUCCESS
+    assert text2.set_size(32) == tvg.Result.SUCCESS
     assert (
         text2.set_text(f"Gradient Text {'テスト' if unicode is True else ''}")
         == tvg.Result.SUCCESS
@@ -849,16 +780,17 @@ def _test_text(font: str, unicode: bool):
     assert fill.set_color_stops(colorstops) == tvg.Result.SUCCESS
 
     assert text2.set_gradient(fill) == tvg.Result.SUCCESS
-    assert canvas.push(text2) == tvg.Result.SUCCESS
+    assert canvas.add(text2) == tvg.Result.SUCCESS
 
-    assert canvas.draw() == tvg.Result.SUCCESS
+    assert canvas.update() == tvg.Result.SUCCESS
+    assert canvas.draw(True) == tvg.Result.SUCCESS
     assert canvas.sync() == tvg.Result.SUCCESS
 
     if PILLOW_LOADED:
         im = canvas.get_pillow()
         assert check_im_same(im, f"test_text_{font_name}_ref.png") is True
 
-    assert engine.font_unload(os.path.join("tests", font)) == tvg.Result.SUCCESS
+    assert text1.font_unload(os.path.join("tests", font)) == tvg.Result.SUCCESS
     assert canvas.destroy() == tvg.Result.SUCCESS
     assert engine.term() == tvg.Result.SUCCESS
 
@@ -878,18 +810,17 @@ def test_animation():
     picture = animation.get_picture()
     assert isinstance(picture, tvg.Picture)
     assert picture.load(os.path.join(file_dir, "test.json")) == tvg.Result.SUCCESS
+    assert animation.get_total_frame() == (tvg.Result.SUCCESS, 50)
     assert picture.set_size(512, 512) == tvg.Result.SUCCESS
 
     assert animation.set_frame(5) == tvg.Result.SUCCESS
-    assert animation.set_segment(0, 0.5) == tvg.Result.SUCCESS
+    assert animation.set_segment(0, 25) == tvg.Result.SUCCESS
 
     result, duration = animation.get_duration()
     assert result == tvg.Result.SUCCESS
-    assert int(duration) == 1
-    assert animation.get_frame() == (tvg.Result.SUCCESS, 5.0)
-    assert animation.get_segment() == (tvg.Result.SUCCESS, 0.0, 0.5)
-    result, total_frame = animation.get_total_frame()
-    assert result == tvg.Result.SUCCESS
-    assert int(total_frame) == 25
-
+    assert duration == 1
+    assert animation.get_frame() == (tvg.Result.SUCCESS, 5)
+    assert animation.get_segment() == (tvg.Result.SUCCESS, 0, 25)
+    assert animation.get_total_frame() == (tvg.Result.SUCCESS, 25)
     assert animation.get_markers_cnt() == (tvg.Result.SUCCESS, 0)
+    assert engine.term() == tvg.Result.SUCCESS

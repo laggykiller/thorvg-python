@@ -116,10 +116,10 @@ jobs:
           'scl enable devtoolset-10 "
           python3.12 -m build --wheel --outdir wheelhouse_anytag &&
           python3.12 -m pip install --root-user-action=ignore auditwheel &&
-          auditwheel repair -w wheelhouse --plat manylinux2014_${{matrix.arch}} ./wheelhouse_anytag/*.whl" &&
+          auditwheel repair -w wheelhouse --plat manylinux2014_${{matrix.arch}} ./wheelhouse_anytag/*.whl &&
           python3.12 -m pip install --root-user-action=ignore ./wheelhouse/*.whl pytest &&
           python3.12 -m pip install --only-binary ":all:" --root-user-action=ignore Pillow; true &&
-          python3.12 -m pytest
+          python3.12 -m pytest"
           '
 
       - uses: actions/upload-artifact@v4

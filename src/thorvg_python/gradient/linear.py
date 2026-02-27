@@ -2,7 +2,7 @@
 import ctypes
 from typing import Optional, Tuple
 
-from ..base import GradientStruct, Result
+from ..base import GradientPointer, Result
 from ..engine import Engine
 from . import Gradient
 
@@ -12,7 +12,7 @@ class LinearGradient(Gradient):
     Linear Gradient API
     """
 
-    def __init__(self, engine: Engine, grad: Optional[GradientStruct] = None):
+    def __init__(self, engine: Engine, grad: Optional[GradientPointer] = None):
         self.engine = engine
         self.thorvg_lib = engine.thorvg_lib
         if grad is None:
@@ -20,32 +20,17 @@ class LinearGradient(Gradient):
         else:
             self._grad = grad
 
-    def _new(self) -> GradientStruct:
+    def _new(self) -> GradientPointer:
         """Creates a new linear gradient object.
 
-        Note that you need not call this method as it is auto called when initializing ``LinearGradient()``.
-
-        .. code-block:: python
-
-            from thorvg_python import Engine, Shape, LinearGradient, ColorStop
-
-            engine = Engine()
-            shape = Shape(engine)
-            shape.append_rect(700, 700, 100, 100, 20, 20)
-            grad = LinearGradient(engine)
-            grad.set(700, 700, 800, 800)
-            color_stops = [
-                ColorStop(0.0, 0, 0,   0, 255),
-                ColorStop(1.0, 0, 255, 0, 255),
-            ]
-            grad.set_color_stops(color_stops, 2)
-            shape.set_linear_gradient(grad)
-
         :return: A new linear gradient object.
-        :rtype: GradientStruct
+        :rtype: GradientPointer
+
+        .. note::
+            You need not call this method as it is auto called when initializing ``LinearGradient()``.
         """
-        self.thorvg_lib.tvg_linear_gradient_new.restype = ctypes.POINTER(GradientStruct)
-        return self.thorvg_lib.tvg_linear_gradient_new().contents
+        self.thorvg_lib.tvg_linear_gradient_new.restype = GradientPointer
+        return self.thorvg_lib.tvg_linear_gradient_new()
 
     def set(
         self,
@@ -65,15 +50,15 @@ class LinearGradient(Gradient):
         :param float x2: The horizontal coordinate of the second point used to determine the gradient bounds.
         :param float y2: The vertical coordinate of the second point used to determine the gradient bounds.
 
-        :return: INVALID_ARGUMENT An invalid GradientStruct pointer.
+        :return: Result.INVALID_ARGUMENT An invalid GradientPointer.
         :rtype: Result
 
         .. note::
-            In case the first and the second points are equal, an object is filled with a single color using the last color specified in the tvg_gradient_set_color_stops().
+            In case the first and the second points are equal, an object is filled with a single color using the last color specified in the Gradient.set_color_stops().
         .. seealso:: Gradient.set_color_stops()
         """
         self.thorvg_lib.tvg_linear_gradient_set.argtypes = [
-            ctypes.POINTER(GradientStruct),
+            GradientPointer,
             ctypes.c_float,
             ctypes.c_float,
             ctypes.c_float,
@@ -81,7 +66,7 @@ class LinearGradient(Gradient):
         ]
         self.thorvg_lib.tvg_linear_gradient_set.restype = Result
         return self.thorvg_lib.tvg_linear_gradient_set(
-            ctypes.pointer(self._grad),
+            self._grad,
             ctypes.c_float(x1),
             ctypes.c_float(y1),
             ctypes.c_float(x2),
@@ -97,7 +82,7 @@ class LinearGradient(Gradient):
         the given points (``x1``, ``y1``) and (``x2``, ``y2``), respectively. Both lines are perpendicular to the line linking
         (``x1``, ``y1``) and (``x2``, ``y2``).
 
-        :return: INVALID_ARGUMENT An invalid GradientStruct pointer.
+        :return: Result.INVALID_ARGUMENT An invalid GradientPointer.
         :rtype: Result
         :return: The horizontal coordinate of the first point used to determine the gradient bounds.
         :rtype: float
@@ -113,7 +98,7 @@ class LinearGradient(Gradient):
         x2 = ctypes.c_float()
         y2 = ctypes.c_float()
         self.thorvg_lib.tvg_linear_gradient_get.argtypes = [
-            ctypes.POINTER(GradientStruct),
+            GradientPointer,
             ctypes.POINTER(ctypes.c_float),
             ctypes.POINTER(ctypes.c_float),
             ctypes.POINTER(ctypes.c_float),
@@ -121,7 +106,7 @@ class LinearGradient(Gradient):
         ]
         self.thorvg_lib.tvg_linear_gradient_get.restype = Result
         result = self.thorvg_lib.tvg_linear_gradient_get(
-            ctypes.pointer(self._grad),
+            self._grad,
             ctypes.pointer(x1),
             ctypes.pointer(y1),
             ctypes.pointer(x2),
