@@ -9,15 +9,16 @@ canvas = tvg.SwCanvas(engine)
 canvas.set_target(512, 256)  # w, h
 
 rect = tvg.Shape(engine)
-rect.append_rect(10, 10, 64, 64, 10, 10)  # x, y, w, h, rx, ry
+rect.append_rect(10, 10, 64, 64, 10, 10, True)  # x, y, w, h, rx, ry, clockwise
 rect.set_fill_color(32, 64, 128, 100)  # r, g, b, a
-canvas.push(rect)
+canvas.add(rect)
 
 canvas.update()
 canvas.draw(True)
 canvas.sync()
 
 im = canvas.get_pillow()
+im.save("test.png")
 canvas.destroy()
 engine.term()
 ```
