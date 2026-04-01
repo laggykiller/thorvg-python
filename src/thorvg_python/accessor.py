@@ -112,4 +112,4 @@ class Accessor:
             ctypes.POINTER(name_char_type)
         ]
         self.thorvg_lib.tvg_accessor_generate_id.restype = ctypes.c_uint32
-        return self.thorvg_lib.tvg_accessor_generate_id(ctypes.pointer(name_char)).value
+        return self.thorvg_lib.tvg_accessor_generate_id(ctypes.pointer(name_char))
