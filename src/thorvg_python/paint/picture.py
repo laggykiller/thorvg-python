@@ -2,7 +2,13 @@
 import ctypes
 from typing import Callable, Optional, Tuple
 
-from ..base import Colorspace, PaintPointer, PictureAssetResolverType, Result
+from ..base import (
+    Colorspace,
+    FilterMethod,
+    PaintPointer,
+    PictureAssetResolverType,
+    Result,
+)
 from ..engine import Engine
 from . import Paint
 
@@ -368,3 +374,29 @@ class Picture(Paint):
             return Paint(self.engine, paint_struct)
         else:
             return None
+
+    def set_filter(self, method: FilterMethod) -> Result:
+        """Sets the image filtering method for rendering this picture.
+
+        Specifies how the image data should be filtered when it is scaled or transformed
+        during rendering. This affects the visual quality and performance of the output.
+
+        :param thorvg_python.base.FilterMethod method:
+            The filtering method to apply. Default is thorvg_python.base.FilterMethod.BILINEAR
+
+        :return: Result
+        :rtype: thorvg_python.base.Result
+
+        .. seealso:: FilterMethod
+        .. note::
+            Experimental API
+        """
+        self.thorvg_lib.tvg_picture_set_filter.argtypes = [
+            PaintPointer,
+            ctypes.c_uint8,
+        ]
+        self.thorvg_lib.tvg_picture_set_filter.restype = Result
+        result = self.thorvg_lib.tvg_picture_set_filter(
+            self._paint, ctypes.c_uint8(method)
+        )
+        return result

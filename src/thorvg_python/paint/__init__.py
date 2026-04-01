@@ -64,9 +64,9 @@ class Paint:
         self.thorvg_lib.tvg_paint_ref.restype = ctypes.c_uint16
         return self.thorvg_lib.tvg_paint_ref(
             self._paint,
-        ).value
+        )
 
-    def deref(self, free: bool) -> int:
+    def unref(self, free: bool) -> int:
         """Decrement the reference count for the PaintPointer object.
 
         This method decreases the reference count of the PaintPointer object by 1.
@@ -82,12 +82,12 @@ class Paint:
 
         .. versionadded:: 1.0
         """
-        self.thorvg_lib.tvg_paint_deref.argtypes = [
+        self.thorvg_lib.tvg_paint_unref.argtypes = [
             PaintPointer,
             ctypes.c_bool,
         ]
-        self.thorvg_lib.tvg_paint_deref.restype = ctypes.c_uint16
-        return self.thorvg_lib.tvg_paint_deref(self._paint, ctypes.c_bool(free)).value
+        self.thorvg_lib.tvg_paint_unref.restype = ctypes.c_uint16
+        return self.thorvg_lib.tvg_paint_unref(self._paint, ctypes.c_bool(free))
 
     def get_ref(self) -> int:
         """Retrieve the current reference count of the PaintPointer object.
@@ -108,7 +108,7 @@ class Paint:
         self.thorvg_lib.tvg_paint_get_ref.restype = ctypes.c_uint16
         return self.thorvg_lib.tvg_paint_get_ref(
             self._paint,
-        ).value
+        )
 
     def set_visible(self, visible: bool) -> Result:
         """Sets the visibility of the Paint object.
@@ -139,23 +139,15 @@ class Paint:
             self._paint, ctypes.c_bool(visible)
         )
 
-    def get_visible(self, visible: bool) -> Result:
-        """Sets the visibility of the Paint object.
+    def get_visible(self) -> Result:
+        """Gets the current visibility status of the Paint object..
 
-        This is useful for selectively excluding paint objects during rendering.
+        :return:
+            True if the object is visible and will be rendered.
+            False if the object is hidden and will not be rendered.
+        :rtype: bool
 
-        :param bool visible: A boolean flag indicating visibility. The default is ``true``.
-            - ``true``: the object will be rendered by the engine.
-            - ``false``: the object will be excluded from the drawing process.
-
-        .. note::
-            An invisible object is not considered inactive—it may still participate
-            in internal update processing if its properties are updated, but it will not
-            be taken into account for the final drawing output. To completely deactivate
-            a paint object, remove it from the canvas.
-
-        .. seealso:: Paint.get_visible()
-        .. seealso:: Canvas.remove()
+        .. seealso:: Paint.set_visible()
 
         .. versionadded:: 1.0
         """
@@ -165,7 +157,50 @@ class Paint:
         self.thorvg_lib.tvg_paint_get_visible.restype = ctypes.c_bool
         return self.thorvg_lib.tvg_paint_get_visible(
             self._paint,
-        ).value
+        )
+
+    def get_id(self) -> int:
+        """Gets the ID of the Paint object.
+
+        :return: The ID of the paint object, or 0 if the ID is not set.
+        :rtype: int
+
+        .. seealso:: Picture.get_paint()
+        .. seealso:: Accessor.generate_id()
+        .. seealso:: Paint.set_id()
+
+        .. note::
+            Experimental API
+        """
+        self.thorvg_lib.tvg_paint_get_id.argtypes = [
+            PaintPointer,
+        ]
+        self.thorvg_lib.tvg_paint_get_id.restype = ctypes.c_uint32
+        return self.thorvg_lib.tvg_paint_get_id(
+            self._paint,
+        )
+
+    def set_id(self, _id: int) -> Result:
+        """Sets the ID of the Paint object.
+
+        :param int _id: The ID to assign to the paint object.
+
+        .. seealso:: Picture.get_paint()
+        .. seealso:: Accessor.generate_id()
+        .. seealso:: Paint.get_id()
+
+        .. note::
+            Experimental API
+        """
+        self.thorvg_lib.tvg_paint_set_id.argtypes = [
+            PaintPointer,
+            ctypes.c_uint32,
+        ]
+        self.thorvg_lib.tvg_paint_set_id.restype = Result
+        return self.thorvg_lib.tvg_paint_set_id(
+            self._paint,
+            _id,
+        )
 
     def scale(self, factor: float) -> Result:
         """Scales the given PaintPointer object by the given factor.

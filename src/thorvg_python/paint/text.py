@@ -2,7 +2,14 @@
 import ctypes
 from typing import Optional, Tuple
 
-from ..base import GradientPointer, PaintPointer, Result, TextMetrics, TextWrap
+from ..base import (
+    GlyphMetrics,
+    GradientPointer,
+    PaintPointer,
+    Result,
+    TextMetrics,
+    TextWrap,
+)
 from ..engine import Engine
 from ..gradient import Gradient
 from . import Paint
@@ -128,8 +135,9 @@ class Text(Paint):
 
         :param str utf8: The multi-byte text encoded with utf8 string to be rendered.
 
-        :rtyle: Result
+        :rtype: Result
 
+        .. seealso:: Text.get_text()
         .. versionadded: 1.0
         """
         utf8_bytes = utf8.encode() + b"\x00"
@@ -144,6 +152,29 @@ class Text(Paint):
             self._paint,
             ctypes.pointer(text_arr),
         )
+
+    def get_text(self) -> str:
+        """Returns the currently assigned unicode text.
+
+        This function retrieves the unicode string that is currently set
+        for rendering. The returned text is encoded in UTF-8.
+
+        :return: The UTF-8 encoded multi-byte text string.
+        :rtype: str
+
+        .. seealso:: Text.set_text()
+
+        .. note::
+            Experimental API
+        """
+        self.thorvg_lib.tvg_text_set_text.argtypes = [
+            PaintPointer,
+        ]
+        self.thorvg_lib.tvg_text_set_text.restype = ctypes.c_char_p
+
+        return self.thorvg_lib.tvg_text_set_text(
+            self._paint,
+        ).decode("utf-8")
 
     def align(self, x: float, y: float) -> Result:
         """Sets text alignment or anchor per axis.
@@ -210,6 +241,7 @@ class Text(Paint):
         :param thorvg_python.base.TextWrap mode: The wrapping strategy to apply. Default is ``NONE``.
 
         .. seealso:: TextWrap
+        .. seealso:: Text.line_count()
         .. versionadded:: 1.0
         """
         self.thorvg_lib.tvg_text_wrap_mode.argtypes = [
@@ -220,6 +252,28 @@ class Text(Paint):
         return self.thorvg_lib.tvg_text_wrap_mode(
             self._paint,
             mode,
+        )
+
+    def line_count(self) -> int:
+        """Returns the number of text lines.
+
+        This function retrieves the number of lines generated after applying text layout and wrapping.
+        The returned value reflects the current wrapping configuration set by thorvg_python.Text.wrap_mode().
+        The line count is also increased by explicit line feed characters ('\n') contained in the text.
+
+        :return: The total number of lines
+        :rtype: int
+
+        .. seealso:: Text.wrap_mode()
+        .. note::
+            Experimental API
+        """
+        self.thorvg_lib.tvg_text_wrap_mode.argtypes = [
+            PaintPointer,
+        ]
+        self.thorvg_lib.tvg_text_wrap_mode.restype = ctypes.c_uint32
+        return self.thorvg_lib.tvg_text_wrap_mode(
+            self._paint,
         )
 
     def spacing(self, letter: float, line: float) -> Result:
@@ -389,7 +443,7 @@ class Text(Paint):
             gradient._grad,  # type: ignore
         )
 
-    def get_metrics(self) -> Tuple[Result, TextMetrics]:
+    def get_text_metrics(self) -> Tuple[Result, TextMetrics]:
         """Retrieves the layout metrics of the text object.
 
         Fills the provided `TextMetrics` structure with the font layout values of this text object,
@@ -400,7 +454,7 @@ class Text(Paint):
 
         :return: A `TextMetrics` structure filled with the resulting values.
         :rtype: thorvg_python.base.TextMetrics
-        :return: TVG_RESULT_INSUFFICIENT_CONDITION if no font or size has been set yet.
+        :return: Result.INSUFFICIENT_CONDITION if no font or size has been set yet.
         :rtype: thorvg_python.base.Result
 
         .. seealso:: TextMetrics
@@ -408,13 +462,56 @@ class Text(Paint):
             Experimental API
         """
         metrics = TextMetrics()
-        self.thorvg_lib.tvg_text_get_metrics.argtypes = [
+        self.thorvg_lib.tvg_text_get_text_metrics.argtypes = [
             PaintPointer,
             ctypes.POINTER(TextMetrics),
         ]
-        self.thorvg_lib.tvg_text_get_metrics.restype = Result
-        result = self.thorvg_lib.tvg_text_get_metrics(
+        self.thorvg_lib.tvg_text_get_text_metrics.restype = Result
+        result = self.thorvg_lib.tvg_text_get_text_metrics(
             self._paint,
+            ctypes.pointer(metrics),
+        )
+        return result, metrics
+
+    def get_glyph_metrics(self, ch: str) -> Tuple[Result, GlyphMetrics]:
+        """Retrieves the layout metrics of a glyph in the text object.
+
+        Fills the provided @ref Tvg_Glyph_Metrics structure with the horizontal layout values
+        of the specified glyph, such as advance, left-side bearing, and bounding box.
+
+        The returned values reflect the font size applied to the text object,
+        but do not include any transformations (e.g., scale, rotation, or translation).
+
+        The input character must be a single UTF-8 encoded character.
+
+        :return: A `GlyphMetrics` structure filled with the resulting values.
+        :rtype: thorvg_python.base.GlyphMetrics
+        :return:
+            Result.INSUFFICIENT_CONDITION if no font or size has been set yet.
+            RESULT.INVALID_ARGUMENT if the given character is invalid or not supported.
+        :rtype: thorvg_python.base.Result
+
+        .. seealso:: GlyphMetrics
+        .. note::
+            Currently, ThorVG only supports horizontal text layout.
+        .. note::
+            Experimental API
+        """
+        metrics = GlyphMetrics()
+
+        ch_bytes = ch.encode() + b"\x00"
+        ch_arr_type = ctypes.c_char * len(ch_bytes)
+        ch_arr = ch_arr_type.from_buffer_copy(ch_bytes)
+
+        self.thorvg_lib.tvg_text_get_glyph_metrics.argtypes = [
+            PaintPointer,
+            ctypes.POINTER(ch_arr_type),
+            ctypes.POINTER(GlyphMetrics),
+        ]
+        self.thorvg_lib.tvg_text_get_glyph_metrics.restype = Result
+        result = self.thorvg_lib.tvg_text_get_glyph_metrics(
+            self._paint,
+            ctypes.pointer(ch_arr),
             ctypes.pointer(metrics),
         )
         return result, metrics

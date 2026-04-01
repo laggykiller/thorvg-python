@@ -318,6 +318,18 @@ def test_paint():
     ]
     assert matrix_list == matrix_out_list
 
+    assert shape.get_ref() == 1
+    assert shape.ref() == 2
+    assert shape.unref(free=False) == 1
+
+    assert shape.set_visible(False) == tvg.Result.SUCCESS
+    assert shape.get_visible() is False
+    assert shape.set_visible(True) == tvg.Result.SUCCESS
+
+    assert shape.get_id() == 0
+    assert shape.set_id(1337) == tvg.Result.SUCCESS
+    assert shape.get_id() == 1337
+
     shape2 = tvg.Shape(engine)
     assert shape.set_mask_method(shape2, tvg.MaskMethod.DARKEN) == tvg.Result.SUCCESS
     result, method = shape.get_mask_method(shape2)

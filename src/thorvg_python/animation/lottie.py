@@ -204,6 +204,50 @@ class LottieAnimation(Animation):
             _name = None
         return result, _name
 
+    def get_marker_info(self, idx: int) -> Tuple[Result, Optional[str], float, float]:
+        """Retrieves marker information by index
+
+        :param int idx: The zero-based index of the animation marker.
+
+        :return:
+            Result.INVALID_ARGUMENT if ``idx`` is out of range.
+            Result.INSUFFICIENT_CONDITION In case the animation is not loaded.
+        :rtype: Result
+        :return: The marker name.
+        :rtype: Optional[str]
+        :return: The marker's starting frame.
+        :rtype: float
+        :return: The marker's ending frame.
+        :rtype: float
+
+        .. seealso:: LottieAnimation.get_markers_cnt()
+        .. note::
+            Experimental API
+        """
+        name = ctypes.c_char_p()
+        begin = ctypes.c_float()
+        end = ctypes.c_float()
+        self.thorvg_lib.tvg_lottie_animation_get_marker_info.argtypes = [
+            AnimationPointer,
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_char_p),
+            ctypes.POINTER(ctypes.c_float),
+            ctypes.POINTER(ctypes.c_float),
+        ]
+        self.thorvg_lib.tvg_lottie_animation_get_marker_info.restype = Result
+        result = self.thorvg_lib.tvg_lottie_animation_get_marker_info(
+            self._animation,
+            ctypes.c_uint32(idx),
+            ctypes.pointer(name),
+            ctypes.pointer(begin),
+            ctypes.pointer(end),
+        )
+        if name.value is not None:
+            _name = name.value.decode("utf-8")
+        else:
+            _name = None
+        return result, _name, begin.value, end.value
+
     def tween(self, _from: float, to: float, progress: float) -> Result:
         """Interpolates between two frames over a specified duration.
 

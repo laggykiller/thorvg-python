@@ -115,7 +115,7 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
         [
             "conan",
             "export",
-            "--version=1.0.1",
+            "--version=1.0.3",
             "thorvg_conan",
         ]
     )
@@ -134,7 +134,7 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
             "--deployer=direct_deploy",
             "--format=json",
             "--profile:all=thorvg_python",
-            "--requires=thorvg/1.0.1",
+            "--requires=thorvg/1.0.3",
         ],
         stdout=subprocess.PIPE,
     ).stdout.decode()

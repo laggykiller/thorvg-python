@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """thorvg-python"""
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 
 from .accessor import Accessor  # type: ignore  # noqa: F401
 from .animation import Animation  # type: ignore  # noqa: F401
@@ -11,6 +11,8 @@ from .base import Colorspace  # type: ignore  # noqa: F401
 from .base import ColorStop  # type: ignore  # noqa: F401
 from .base import EngineOption  # type: ignore  # noqa: F401
 from .base import FillRule  # type: ignore  # noqa: F401
+from .base import FilterMethod  # type: ignore  # noqa: F401
+from .base import GlyphMetrics  # type: ignore  # noqa: F401
 from .base import MaskMethod  # type: ignore  # noqa: F401
 from .base import Matrix  # type: ignore  # noqa: F401
 from .base import PathCommand  # type: ignore  # noqa: F401

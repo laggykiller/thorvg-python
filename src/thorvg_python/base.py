@@ -396,6 +396,20 @@ class FillRule(IntEnum):
         return int(obj)
 
 
+class FilterMethod(IntEnum):
+    """Defines the image filtering method used during image scaling or transformation.
+
+    .. note::
+        Experimental API
+    """
+
+    #: Smooth interpolation using surrounding pixels for higher quality.
+    BILINEAR = 0
+
+    #: Fast filtering using nearest-neighbor sampling.
+    NEAREST = 1
+
+
 class ColorStop(ctypes.Structure):
     """A data structure storing the information about the color and its relative position inside the gradient bounds."""
 
@@ -493,6 +507,19 @@ class TextMetrics(ctypes.Structure):
     descent: float  #: Distance from the baseline to the bottom of the lowest glyph (usually negative, as in TTF).
     linegap: float  #: Additional spacing recommended between lines (leading).
     advance: float  #: The total vertical advance between lines of text: ascent - descent + linegap (i.e., ascent + |descent| + linegap when descent is negative).
+
+
+class GlyphMetrics(ctypes.Structure):
+    _fields_ = [
+        ("advance", ctypes.c_float),
+        ("bearing", ctypes.c_float),
+        ("min", PointStruct),
+        ("max", PointStruct),
+    ]
+    advance: float  #: The advance distance along the baseline (inline) direction.
+    bearing: float  #: The bearing from the origin to the glyph’s visible bound along the inline-start direction.
+    min: PointStruct  #: The minimum point of the glyph bounding box in local space.
+    max: PointStruct  #: The maximum point of the glyph bounding box in local space.
 
 
 """Callback function type for resolving external assets.
