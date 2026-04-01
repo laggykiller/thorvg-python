@@ -355,12 +355,12 @@ class Picture(Paint):
         .. seealso:: Engine.accessor_generate_id()
         .. versionadded: 1.0
         """
-        self.thorvg_lib.tvg_picture_get_size.argtypes = [
+        self.thorvg_lib.tvg_picture_get_paint.argtypes = [
             PaintPointer,
             ctypes.c_uint32,
         ]
-        self.thorvg_lib.tvg_picture_get_size.restype = PaintPointer
-        paint_struct = self.thorvg_lib.tvg_picture_get_size(
+        self.thorvg_lib.tvg_picture_get_paint.restype = PaintPointer
+        paint_struct = self.thorvg_lib.tvg_picture_get_paint(
             self._paint,
             ctypes.c_uint32(_id),
         )

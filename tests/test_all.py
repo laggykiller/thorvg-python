@@ -515,6 +515,7 @@ def _test_picture_load(test_file: str, ref: str):
         assert check_im_same(im, ref) is True
 
     assert picture.get_size() == (tvg.Result.SUCCESS, 256, 256)
+    assert isinstance(picture.get_paint(0), tvg.Paint)
 
     assert canvas.destroy() == tvg.Result.SUCCESS
     assert engine.term() == tvg.Result.SUCCESS
