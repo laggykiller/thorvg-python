@@ -3,6 +3,7 @@
 
 __version__ = "1.1.1"
 
+from .accessor import Accessor  # type: ignore  # noqa: F401
 from .animation import Animation  # type: ignore  # noqa: F401
 from .animation.lottie import LottieAnimation  # type: ignore  # noqa: F401
 from .base import BlendMethod  # type: ignore  # noqa: F401
