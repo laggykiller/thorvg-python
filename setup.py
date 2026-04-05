@@ -91,8 +91,9 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
     if "thorvg_python" not in profiles:
         subprocess.run(["conan", "profile", "detect", "-f", "--name", "thorvg_python"])
 
-        if platform.architecture()[0] == "32bit" or platform.machine().lower() not in (
-            CONAN_ARCHS["x86_64"]
+        if (
+            platform.architecture()[0] == "32bit"
+            or platform.machine().lower() not in (CONAN_ARCHS["x86_64"])
         ):
             profile_path = (
                 subprocess.run(
