@@ -189,7 +189,7 @@ class LottieAnimation(Animation):
         name = ctypes.c_char_p()
         self.thorvg_lib.tvg_lottie_animation_get_marker.argtypes = [
             AnimationPointer,
-            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.c_uint32,
             ctypes.POINTER(ctypes.c_char_p),
         ]
         self.thorvg_lib.tvg_lottie_animation_get_marker.restype = Result
