@@ -91,19 +91,25 @@ def install_thorvg(arch: str) -> Dict[Any, Any]:
     if "thorvg_python" not in profiles:
         subprocess.run(["conan", "profile", "detect", "-f", "--name", "thorvg_python"])
 
+        profile_path = (
+            subprocess.run(
+                ["conan", "profile", "path", "thorvg_python"],
+                stdout=subprocess.PIPE,
+            )
+            .stdout.decode()
+            .strip()
+        )
+
+        with open(profile_path, "a+") as f:
+            # https://github.com/conan-io/conan/issues/19179#issuecomment-3472691734
+            f.write("\n")
+            f.write("[replace_requires]\n")
+            f.write("libjpeg-turbo/*: libjpeg-turbo/3.1.3")
+
         if (
             platform.architecture()[0] == "32bit"
             or platform.machine().lower() not in (CONAN_ARCHS["x86_64"])
         ):
-            profile_path = (
-                subprocess.run(
-                    ["conan", "profile", "path", "thorvg_python"],
-                    stdout=subprocess.PIPE,
-                )
-                .stdout.decode()
-                .strip()
-            )
-
             with open(profile_path, "a+") as f:
                 # https://github.com/conan-io/conan/issues/19179#issuecomment-3472691734
                 f.write("\n")
