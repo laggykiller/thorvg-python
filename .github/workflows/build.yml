@@ -84,6 +84,7 @@ jobs:
         uses: docker/setup-qemu-action@v2
         with:
           platforms: all
+          image: tonistiigi/binfmt:qemu-v10.1.3
 
       - name: Build wheels
         if: runner.os != 'Linux'
