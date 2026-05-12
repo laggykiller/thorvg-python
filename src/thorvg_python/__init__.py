@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """thorvg-python"""
 
-__version__ = "1.1.2"
+__version__ = "1.1.3"
 
 from .accessor import Accessor  # type: ignore  # noqa: F401
 from .animation import Animation  # type: ignore  # noqa: F401

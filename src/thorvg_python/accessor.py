@@ -113,3 +113,38 @@ class Accessor:
         ]
         self.thorvg_lib.tvg_accessor_generate_id.restype = ctypes.c_uint32
         return self.thorvg_lib.tvg_accessor_generate_id(ctypes.pointer(name_char))
+
+    def accessor_get_name(
+        self,
+        _id: int,
+    ) -> str:
+        """Retrieve the original name string from a given unique ID.
+
+        Returns the name associated with the specified identifier.
+
+        This method is only valid when @ref tvg_picture_set_accessible() is set to @c true
+        for the Picture associated with the given @p paint in @ref tvg_accessor_set() Otherwise, the name
+        information may not be available.
+
+        :param int _id: The unique identifier.
+
+        :return: The corresponding name string, or ``None`` if not found or unavailable.
+
+        .. seealso:: tvg_accessor_generate_id()
+        .. seealso:: tvg_accessor_set()
+        .. seealso:: tvg_picture_set_accessible()
+        .. note ::
+            This function is only available within Accessor callbacks registered via @ref tvg_accessor_set().
+        .. note ::
+            Experimental API
+        """
+        self.thorvg_lib.tvg_accessor_get_name.argtypes = [
+            AccessorPointer,
+            ctypes.c_uint32,
+        ]
+        self.thorvg_lib.tvg_accessor_get_name.restype = ctypes.c_char_p
+
+        return self.thorvg_lib.tvg_accessor_get_name(
+            self._accessor,
+            ctypes.c_uint32(_id),
+        ).decode("utf-8")

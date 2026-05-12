@@ -358,6 +358,9 @@ class Picture(Paint):
         :return: A pointer to the paint object that matches the given identifier, or ``None`` if no matching paint object is found.
         :rtype: thorvg_python.base.PaintPointer
 
+        .. note::
+            Setting Picture.set_accessible() to ``True`` enables more efficient access.
+
         .. seealso:: Engine.accessor_generate_id()
         .. versionadded: 1.0
         """
@@ -374,6 +377,34 @@ class Picture(Paint):
             return Paint(self.engine, paint_struct)
         else:
             return None
+
+    def set_accessible(self, accessible: bool) -> Result:
+        """Enable or disable accessible mode for a Picture.
+
+        When accessible mode is enabled, the Picture maintains an internal mapping
+        of ID-accessible vector assets nodes (such as SVG), allowing efficient access to Paint objects
+        and their associated identifier information via Accessor APIs.
+
+        When disabled, no additional mapping is maintained and all nodes are treated
+        as general traversal targets.
+
+        :param bool accessible: Set to ``True`` to enable accessible mode, or ``False`` to disable it.
+
+        .. seealso:: Accessor.generate_id()
+        .. seealso:: Accessor.get_name()
+        .. seealso:: Picture.get_paint()
+        .. versionadded: 1.0
+        """
+        self.thorvg_lib.tvg_picture_set_accessible.argtypes = [
+            PaintPointer,
+            ctypes.c_bool,
+        ]
+        self.thorvg_lib.tvg_picture_set_accessible.restype = PaintPointer
+        result = self.thorvg_lib.tvg_picture_set_accessible(
+            self._paint,
+            ctypes.c_bool(accessible),
+        )
+        return result
 
     def set_filter(self, method: FilterMethod) -> Result:
         """Sets the image filtering method for rendering this picture.
